@@ -1,0 +1,410 @@
+{
+  "datasets": {
+    "GC10-DET": {
+      "surface": "Steel sheet",
+      "defects": [
+        "punching",
+        "weld line",
+        "crescent gap",
+        "water spot",
+        "oil spot",
+        "silk spot",
+        "inclusion",
+        "rolled pit",
+        "crease",
+        "waist fold"
+      ],
+      "counts": {
+        "small": 571,
+        "medium": 977,
+        "large": 2016
+      },
+      "total": 3564,
+      "samples": {
+        "small": [
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/small/images/gc10_4_shuiban_0019_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/small/images/gc10_7_yiwu_0001_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/small/images/gc10_7_yiwu_0002_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/small/images/gc10_5_youban_0002_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/small/images/gc10_5_youban_0002_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/small/images/gc10_5_youban_0003_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/small/images/gc10_5_youban_0005_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/small/images/gc10_5_youban_0005_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/small/images/gc10_9_zhehen_0006_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/small/images/gc10_7_yiwu_0005_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/small/images/gc10_5_youban_0006_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/small/images/gc10_8_yahen_0001_defect.jpg"
+        ],
+        "medium": [
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/medium/images/gc10_3_yueyawan_0001_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/medium/images/gc10_9_zhehen_0001_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/medium/images/gc10_9_zhehen_0001_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/medium/images/gc10_3_yueyawan_0004_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/medium/images/gc10_3_yueyawan_0005_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/medium/images/gc10_3_yueyawan_0006_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/medium/images/gc10_3_yueyawan_0007_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/medium/images/gc10_3_yueyawan_0009_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/medium/images/gc10_3_yueyawan_0010_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/medium/images/gc10_4_shuiban_0005_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/medium/images/gc10_3_yueyawan_0011_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/medium/images/gc10_4_shuiban_0008_defect.jpg"
+        ],
+        "large": [
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/large/images/gc10_3_yueyawan_0002_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/large/images/gc10_6_siban_0001_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/large/images/gc10_6_siban_0002_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/large/images/gc10_6_siban_0003_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/large/images/gc10_6_siban_0004_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/large/images/gc10_6_siban_0005_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/large/images/gc10_3_yueyawan_0003_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/large/images/gc10_3_yueyawan_0008_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/large/images/gc10_4_shuiban_0001_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/large/images/gc10_4_shuiban_0002_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/large/images/gc10_4_shuiban_0003_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/GC10-DET/large/images/gc10_4_shuiban_0003_defect.jpg"
+        ]
+      }
+    },
+    "MTD": {
+      "surface": "Magnetic tiles",
+      "defects": [
+        "blowhole",
+        "break",
+        "crack",
+        "fray",
+        "uneven"
+      ],
+      "counts": {
+        "small": 214,
+        "medium": 87,
+        "large": 161
+      },
+      "total": 462,
+      "samples": {
+        "small": [
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/small/images/mtd_blowhole_0001_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/small/images/mtd_blowhole_0002_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/small/images/mtd_blowhole_0003_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/small/images/mtd_blowhole_0004_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/small/images/mtd_blowhole_0005_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/small/images/mtd_blowhole_0005_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/small/images/mtd_blowhole_0006_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/small/images/mtd_blowhole_0007_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/small/images/mtd_blowhole_0008_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/small/images/mtd_blowhole_0009_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/small/images/mtd_blowhole_0010_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/small/images/mtd_blowhole_0011_defect.jpg"
+        ],
+        "medium": [
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/medium/images/mtd_blowhole_0012_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/medium/images/mtd_blowhole_0050_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/medium/images/mtd_blowhole_0069_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/medium/images/mtd_blowhole_0088_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/medium/images/mtd_blowhole_0107_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/medium/images/mtd_break_0001_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/medium/images/mtd_break_0002_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/medium/images/mtd_break_0002_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/medium/images/mtd_break_0004_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/medium/images/mtd_break_0014_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/medium/images/mtd_break_0015_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/medium/images/mtd_break_0015_defect.jpg"
+        ],
+        "large": [
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/large/images/mtd_break_0006_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/large/images/mtd_break_0007_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/large/images/mtd_break_0011_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/large/images/mtd_break_0020_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/large/images/mtd_break_0021_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/large/images/mtd_break_0025_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/large/images/mtd_break_0035_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/large/images/mtd_break_0036_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/large/images/mtd_break_0041_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/large/images/mtd_break_0041_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/large/images/mtd_break_0050_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MTD/large/images/mtd_break_0051_defect.jpg"
+        ]
+      }
+    },
+    "DAGM": {
+      "surface": "Textured industrial surfaces",
+      "defects": [
+        "10 synthetic texture defect classes"
+      ],
+      "counts": {
+        "small": 593,
+        "medium": 1095,
+        "large": 412
+      },
+      "total": 2100,
+      "samples": {
+        "small": [
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/small/images/dagm_class2_0009_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/small/images/dagm_class2_0010_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/small/images/dagm_class2_0011_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/small/images/dagm_class2_0023_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/small/images/dagm_class2_0025_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/small/images/dagm_class2_0026_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/small/images/dagm_class2_0030_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/small/images/dagm_class2_0031_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/small/images/dagm_class2_0040_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/small/images/dagm_class2_0043_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/small/images/dagm_class2_0049_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/small/images/dagm_class2_0058_defect.png"
+        ],
+        "medium": [
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/medium/images/dagm_class1_0002_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/medium/images/dagm_class1_0003_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/medium/images/dagm_class1_0004_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/medium/images/dagm_class1_0005_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/medium/images/dagm_class1_0006_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/medium/images/dagm_class1_0009_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/medium/images/dagm_class1_0011_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/medium/images/dagm_class1_0013_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/medium/images/dagm_class1_0016_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/medium/images/dagm_class1_0017_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/medium/images/dagm_class1_0018_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/medium/images/dagm_class1_0019_defect.png"
+        ],
+        "large": [
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/large/images/dagm_class1_0001_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/large/images/dagm_class1_0007_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/large/images/dagm_class1_0008_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/large/images/dagm_class1_0010_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/large/images/dagm_class1_0012_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/large/images/dagm_class1_0014_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/large/images/dagm_class1_0015_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/large/images/dagm_class1_0020_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/large/images/dagm_class1_0024_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/large/images/dagm_class1_0025_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/large/images/dagm_class1_0033_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/DAGM/large/images/dagm_class1_0034_defect.png"
+        ]
+      }
+    },
+    "KolektorSDD2": {
+      "surface": "Electrical commutators / metal parts",
+      "defects": [
+        "surface scratches",
+        "cracks",
+        "spots"
+      ],
+      "counts": {
+        "small": 79,
+        "medium": 203,
+        "large": 112
+      },
+      "total": 394,
+      "samples": {
+        "small": [
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/small/images/kolektorsdd2_surface_defect_0003_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/small/images/kolektorsdd2_surface_defect_0009_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/small/images/kolektorsdd2_surface_defect_0023_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/small/images/kolektorsdd2_surface_defect_0027_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/small/images/kolektorsdd2_surface_defect_0032_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/small/images/kolektorsdd2_surface_defect_0035_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/small/images/kolektorsdd2_surface_defect_0038_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/small/images/kolektorsdd2_surface_defect_0049_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/small/images/kolektorsdd2_surface_defect_0052_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/small/images/kolektorsdd2_surface_defect_0054_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/small/images/kolektorsdd2_surface_defect_0063_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/small/images/kolektorsdd2_surface_defect_0063_defect.png"
+        ],
+        "medium": [
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/medium/images/kolektorsdd2_surface_defect_0001_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/medium/images/kolektorsdd2_surface_defect_0002_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/medium/images/kolektorsdd2_surface_defect_0005_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/medium/images/kolektorsdd2_surface_defect_0006_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/medium/images/kolektorsdd2_surface_defect_0007_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/medium/images/kolektorsdd2_surface_defect_0008_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/medium/images/kolektorsdd2_surface_defect_0010_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/medium/images/kolektorsdd2_surface_defect_0011_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/medium/images/kolektorsdd2_surface_defect_0019_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/medium/images/kolektorsdd2_surface_defect_0021_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/medium/images/kolektorsdd2_surface_defect_0025_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/medium/images/kolektorsdd2_surface_defect_0026_defect.png"
+        ],
+        "large": [
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/large/images/kolektorsdd2_surface_defect_0004_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/large/images/kolektorsdd2_surface_defect_0012_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/large/images/kolektorsdd2_surface_defect_0013_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/large/images/kolektorsdd2_surface_defect_0014_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/large/images/kolektorsdd2_surface_defect_0015_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/large/images/kolektorsdd2_surface_defect_0016_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/large/images/kolektorsdd2_surface_defect_0017_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/large/images/kolektorsdd2_surface_defect_0018_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/large/images/kolektorsdd2_surface_defect_0020_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/large/images/kolektorsdd2_surface_defect_0020_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/large/images/kolektorsdd2_surface_defect_0022_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/KolektorSDD2/large/images/kolektorsdd2_surface_defect_0024_defect.png"
+        ]
+      }
+    },
+    "MPDD": {
+      "surface": "Metal parts (brackets, connectors, plates, tubes)",
+      "defects": [
+        "surface defects per part type"
+      ],
+      "counts": {
+        "small": 255,
+        "medium": 164,
+        "large": 89
+      },
+      "total": 508,
+      "samples": {
+        "small": [
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/small/images/mpdd_bracket_black_0001_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/small/images/mpdd_bracket_black_0001_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/small/images/mpdd_bracket_black_0001_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/small/images/mpdd_bracket_black_0002_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/small/images/mpdd_bracket_black_0002_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/small/images/mpdd_bracket_black_0003_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/small/images/mpdd_bracket_black_0003_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/small/images/mpdd_bracket_black_0004_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/small/images/mpdd_bracket_black_0004_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/small/images/mpdd_bracket_black_0005_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/small/images/mpdd_bracket_black_0006_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/small/images/mpdd_bracket_black_0006_defect.png"
+        ],
+        "medium": [
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/medium/images/mpdd_bracket_brown_0001_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/medium/images/mpdd_bracket_brown_0001_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/medium/images/mpdd_bracket_brown_0001_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/medium/images/mpdd_bracket_brown_0002_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/medium/images/mpdd_bracket_brown_0002_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/medium/images/mpdd_bracket_brown_0002_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/medium/images/mpdd_bracket_brown_0003_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/medium/images/mpdd_bracket_brown_0003_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/medium/images/mpdd_bracket_brown_0003_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/medium/images/mpdd_bracket_brown_0004_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/medium/images/mpdd_bracket_brown_0004_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/medium/images/mpdd_bracket_brown_0004_defect.png"
+        ],
+        "large": [
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/large/images/mpdd_metal_plate_0001_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/large/images/mpdd_metal_plate_0002_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/large/images/mpdd_metal_plate_0002_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/large/images/mpdd_metal_plate_0003_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/large/images/mpdd_metal_plate_0004_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/large/images/mpdd_metal_plate_0005_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/large/images/mpdd_metal_plate_0006_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/large/images/mpdd_metal_plate_0007_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/large/images/mpdd_metal_plate_0008_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/large/images/mpdd_metal_plate_0009_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/large/images/mpdd_metal_plate_0010_defect.png",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/MPDD/large/images/mpdd_metal_plate_0011_defect.png"
+        ]
+      }
+    },
+    "Severstal": {
+      "surface": "Steel sheet (industrial)",
+      "defects": [
+        "inclusions",
+        "patches",
+        "linear scratches",
+        "edge defects"
+      ],
+      "counts": {
+        "small": 4418,
+        "medium": 10332,
+        "large": 5208
+      },
+      "total": 19958,
+      "samples": {
+        "small": [
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/small/images/severstal_defect1_0001_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/small/images/severstal_defect1_0001_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/small/images/severstal_defect1_0001_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/small/images/severstal_defect1_0001_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/small/images/severstal_defect1_0001_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/small/images/severstal_defect1_0002_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/small/images/severstal_defect1_0002_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/small/images/severstal_defect1_0002_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/small/images/severstal_defect1_0002_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/small/images/severstal_defect1_0002_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/small/images/severstal_defect1_0002_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/small/images/severstal_defect1_0002_defect.jpg"
+        ],
+        "medium": [
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/medium/images/severstal_defect3_0001_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/medium/images/severstal_defect3_0001_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/medium/images/severstal_defect3_0002_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/medium/images/severstal_defect3_0003_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/medium/images/severstal_defect3_0003_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/medium/images/severstal_defect3_0003_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/medium/images/severstal_defect3_0003_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/medium/images/severstal_defect3_0003_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/medium/images/severstal_defect3_0003_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/medium/images/severstal_defect4_0002_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/medium/images/severstal_defect4_0002_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/medium/images/severstal_defect4_0003_defect.jpg"
+        ],
+        "large": [
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/large/images/severstal_defect4_0001_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/large/images/severstal_defect4_0001_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/large/images/severstal_defect4_0004_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/large/images/severstal_defect4_0004_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/large/images/severstal_defect3_0005_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/large/images/severstal_defect3_0005_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/large/images/severstal_defect4_0005_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/large/images/severstal_defect4_0005_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/large/images/severstal_defect3_0008_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/large/images/severstal_defect3_0008_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/large/images/severstal_defect3_0008_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/Severstal/large/images/severstal_defect3_0008_defect.jpg"
+        ]
+      }
+    },
+    "VisA": {
+      "surface": "Various manufactured parts",
+      "defects": [
+        "anomalies per product category"
+      ],
+      "counts": {
+        "small": 178,
+        "medium": 64,
+        "large": 2
+      },
+      "total": 244,
+      "samples": {
+        "small": [
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/small/images/visa_candle_0001_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/small/images/visa_candle_0002_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/small/images/visa_candle_0003_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/small/images/visa_candle_0004_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/small/images/visa_candle_0005_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/small/images/visa_candle_0006_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/small/images/visa_candle_0007_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/small/images/visa_candle_0008_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/small/images/visa_candle_0009_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/small/images/visa_candle_0010_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/small/images/visa_candle_0011_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/small/images/visa_capsules_0001_defect.jpg"
+        ],
+        "medium": [
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/medium/images/visa_candle_0012_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/medium/images/visa_candle_0012_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/medium/images/visa_candle_0012_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/medium/images/visa_candle_0012_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/medium/images/visa_candle_0012_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/medium/images/visa_candle_0012_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/medium/images/visa_candle_0012_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/medium/images/visa_candle_0012_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/medium/images/visa_candle_0012_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/medium/images/visa_chewinggum_0001_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/medium/images/visa_chewinggum_0002_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/medium/images/visa_chewinggum_0003_defect.jpg"
+        ],
+        "large": [
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/large/images/visa_fryum_0002_defect.jpg",
+          "https://huggingface.co/datasets/ananya098/SmallDefectDataseet/resolve/main/VisA/large/images/visa_fryum_0002_defect.jpg"
+        ]
+      }
+    }
+  },
+  "totals": {
+    "small": 6308,
+    "medium": 12922,
+    "large": 8000,
+    "total": 27230
+  }
+}
