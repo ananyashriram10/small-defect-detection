@@ -1,0 +1,37 @@
+# secrets
+.env
+.env.*
+!.env.example
+
+# datasets and large archives
+*.tar
+*.tar.gz
+*.zip
+Mandi_images/
+Mandi_images_organized/
+processed_output/
+Binary Mask Dataset-*/
+dataset_explorer/data/
+
+# model checkpoints and training outputs
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+dfine_results/
+*_results/
+runs/
+wandb/
+
+# notebook checkpoints and python cache
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+
+# OS junk
+.DS_Store
+._*
+
+# third-party papers (copyrighted, not ours to redistribute)
+The Devil is in the Crack Orientation.pdf
+Sharma_Portable_Active_Learning_for_Object_Detection_CVPR_2026_paper.pdf
