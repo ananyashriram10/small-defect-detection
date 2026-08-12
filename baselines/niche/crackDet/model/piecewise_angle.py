@@ -89,6 +89,7 @@ def forward_transform(theta_deg: torch.Tensor, h: torch.Tensor, w: torch.Tensor)
     must already lie in [0, 180). Returns (theta_i, h_i, w_i, branch_idx),
     same shape as the inputs plus branch_idx (long tensor).
     """
+    theta_deg = theta_deg.clamp(min=0.0, max=180.0 - 1e-4)
     branch_idx = get_branch_index(theta_deg)
     theta_rad = _deg2rad(theta_deg)
     cos_t, sin_t = torch.cos(theta_rad), torch.sin(theta_rad)
