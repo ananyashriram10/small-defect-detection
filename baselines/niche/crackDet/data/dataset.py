@@ -24,25 +24,24 @@ five-parameter definition, Sec. 3.1); `theta_deg` in [0, 180). `label` is
 optional (defaults to 0) and indexes into `heatmap`'s class channel, for
 datasets with more than one oriented-object category.
 
-Preprocessing intentionally matches this project's other baseline scripts
-(train_segnext_t_runpod.py, PIDNet/GCNet's *_kaggle.ipynb) wherever the
-task allows it: BILINEAR image resizing and the same ImageNet mean/std
-normalization, applied the same way (float / 255, then subtract mean and
-divide by std as (3,1,1) tensors after the channel-first permute -- not
-just numerically equivalent, the literal same code shape).
-
-One place it deliberately does NOT copy those scripts: they resize images
-by an independent (sx, sy) stretch straight to (IMG_SIZE, IMG_SIZE), which
-is fine for plain semantic segmentation (a resized pixel mask is still a
-valid pixel mask under any stretch) but is NOT fine for oriented boxes --
-under a non-uniform (sx != sy) stretch, a rotated rectangle warps into a
-general parallelogram, not another rotated rectangle, and its "angle"
-stops being well-defined. So this loader instead does a uniform-scale
-("letterbox") resize -- same scale factor s on both axes, zero-padded to
-fill the remaining square -- which rescales every box's (cx, cy, h, w) by
-that single scalar s and leaves theta_deg completely unchanged, exactly
-like every other oriented-detection codebase (MMRotate, DOTA devkit) has
-to handle this same constraint.
+Preprocessing follows the paper exactly, not this project's other baseline
+scripts. The other baselines (SegNeXt/PIDNet/GCNet) resize raw images to a
+fixed size at *training* time via an independent (sx, sy) stretch, because
+that's harmless for a plain pixel mask. CrackDet's paper never does that at
+all -- Sec. 3.5 states the datasets are built by slicing full-resolution
+source images into non-overlapping 512x512 patches ONCE, ahead of time, as
+a dataset-construction step ("we directly slice these images into 512x512
+pixels"), not resizing per-batch inside training. This loader mirrors that
+exactly: it expects every image to already be precisely `input_size` x
+`input_size` and raises a hard error otherwise, instead of silently
+resizing/padding/cropping it into shape. Resizing here would in any case
+be lossy for oriented boxes in a way slicing is not -- a plain crop only
+ever translates a box (angle and side lengths are untouched), whereas any
+resize with sx != sy warps a rotated rectangle into a non-rectangular
+parallelogram, corrupting theta_deg. Use `slice_dataset.py` in this same
+directory to turn full-resolution images + box annotations into
+`input_size`-sized patches the way the paper's own ONPP/ORC/OCCSD were
+built, before pointing this loader at them.
 """
 
 from __future__ import annotations
@@ -77,31 +76,17 @@ class OrientedCrackDataset(Dataset):
     def __len__(self) -> int:
         return len(self.records)
 
-    def _load_image(self, path: str) -> Image.Image:
-        return Image.open(path).convert("RGB")
-
-    def _letterbox_resize(self, img: Image.Image, boxes: List[OrientedBox]):
-        """Uniform-scale resize (same interpolation as every other baseline in this
-        project, PIL BILINEAR) + zero-pad to a square -- see module docstring for why
-        this can't be the other baselines' independent-axis stretch-resize once boxes
-        carry an angle. `scale` is applied identically to cx, cy, h, and w; theta_deg
-        is untouched (a uniform scale never changes a rotated rectangle's angle).
-        """
-        orig_w, orig_h = img.size
-        scale = self.input_size / max(orig_h, orig_w)
-        new_w, new_h = max(1, round(orig_w * scale)), max(1, round(orig_h * scale))
-        resized = img.resize((new_w, new_h), Image.Resampling.BILINEAR)
-
-        canvas = np.zeros((self.input_size, self.input_size, 3), dtype=np.uint8)
-        canvas[:new_h, :new_w] = np.asarray(resized, dtype=np.uint8)
-
-        scaled = []
-        for b in boxes:
-            cx, cy = b.cx * scale, b.cy * scale
-            if cx < new_w and cy < new_h:
-                scaled.append(OrientedBox(cx=cx, cy=cy, h=b.h * scale, w=b.w * scale,
-                                           theta_deg=b.theta_deg, label=b.label))
-        return canvas, scaled
+    def _load_image(self, path: str) -> np.ndarray:
+        img = Image.open(path).convert("RGB")
+        if img.size != (self.input_size, self.input_size):
+            raise ValueError(
+                f"{path}: image is {img.size[0]}x{img.size[1]}, expected exactly "
+                f"{self.input_size}x{self.input_size}. This dataset expects pre-sliced "
+                f"patches (paper Sec. 3.5), not arbitrary-sized images -- run "
+                f"slice_dataset.py first to produce {self.input_size}x{self.input_size} "
+                f"patches from your full-resolution images + annotations."
+            )
+        return np.asarray(img, dtype=np.uint8)
 
     @staticmethod
     def _hflip(img: np.ndarray, boxes: List[OrientedBox]) -> List[OrientedBox]:
@@ -124,14 +109,10 @@ class OrientedCrackDataset(Dataset):
                               theta_deg=b["theta_deg"] % 180.0, label=b.get("label", 0))
                  for b in rec.get("boxes", [])]
 
-        img, boxes = self._letterbox_resize(img, boxes)
-
         if self.augment and np.random.rand() < 0.5:
             img = np.ascontiguousarray(img[:, ::-1])
             boxes = self._hflip(img, boxes)
 
-        # Same pattern as train_segnext_t_runpod.py / PIDNet / GCNet: float, /255,
-        # permute to channel-first, then subtract ImageNet mean and divide by std.
         img_t = torch.from_numpy(img).permute(2, 0, 1).float() / 255.0
         img_t = (img_t - IMAGENET_MEAN) / IMAGENET_STD
 

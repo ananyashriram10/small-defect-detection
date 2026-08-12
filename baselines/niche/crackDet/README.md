@@ -86,6 +86,33 @@ requires `TRAIN_ANNOTATIONS` / `VAL_ANNOTATIONS` / `TEST_ANNOTATIONS` env
 vars pointing at files in that schema and exits with an explanatory error
 if they're not set. **This code has not been trained or run on real data.**
 
+There is still no automated train/val/test splitter — the paper states an
+8:1:1 ratio (Sec. 4.1) but doesn't describe the splitting procedure beyond
+that, and the three env vars above expect files you've already split
+yourself in that ratio.
+
+**Preprocessing matches the paper exactly, not this project's other
+baseline scripts.** SegNeXt/PIDNet/GCNet resize raw images to a fixed size
+at training time via an independent (sx, sy) stretch — fine for a pixel
+mask, but it would silently corrupt an oriented box's angle (a non-uniform
+stretch turns a rotated rectangle into a non-rectangular parallelogram).
+The paper never resizes at all: Sec. 3.5 slices full-resolution source
+images into non-overlapping 512×512 patches *once*, as a dataset-
+construction step, and trains on those patches directly. `dataset.py`
+mirrors that — it expects every image to already be exactly `input_size` ×
+`input_size` and raises a hard error otherwise, rather than silently
+resizing/padding it into shape. [`data/slice_dataset.py`](data/slice_dataset.py)
+replicates that dataset-construction step (full-resolution images + box
+annotations → fixed-size patches, boxes translated to patch-local
+coordinates, angle/side-lengths untouched since a crop is a pure
+translation). One thing it can't reproduce exactly: the paper's reported
+sample counts (e.g. ONPP: 3,104 patches from 200 images) are far smaller
+than exhaustive non-overlapping tiling of their stated source resolutions
+would produce, meaning their pipeline drops most background-only tiles
+somewhere without spelling out the exact rule — `slice_dataset.py` defaults
+to dropping empty (0-box) patches as the closest match to that, flagged
+explicitly in its own docstring as an inferred, not verbatim, choice.
+
 ## Verification status — be precise about what "faithful" means here
 
 This development environment has **no local Python/PyTorch/e2cnn runtime**
@@ -125,6 +152,7 @@ baselines/niche/crackDet/
   data/
     target_generator.py   oriented boxes -> Gaussian heatmap + per-branch regression targets
     dataset.py               OrientedCrackDataset (documents the required JSON schema)
+    slice_dataset.py        replicates the paper's Sec. 3.5 dataset construction (full-res images -> fixed-size patches)
   train_crackdet_runpod.py  training script (Adam, paper's LR schedule, W&B logging)
   verify_architecture.py    shape/gradient/round-trip sanity checks (NOT yet run, see above)
   requirements.txt
