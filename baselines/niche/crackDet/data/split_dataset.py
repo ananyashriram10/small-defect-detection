@@ -1,23 +1,31 @@
-"""Split a sliced CrackDet dataset into train/val/test at the paper's own ratio.
+"""Split a sliced CrackDet dataset into train/val/test at the paper's own ratio,
+stratified across source datasets -- same pattern as every other RunPod script
+in this project (train_mask2former_runpod.py, train_segnext_t_runpod.py, etc.).
 
-Sec. 4.1: "we divide each dataset into the training, validation, and test
-set, with the proportion of 8:1:1." That's the only detail given -- no
-stratification variable, no seed, nothing about how box density per patch
-factors in. So this is a plain random shuffle-and-split at 80/10/10, seeded
-for reproducibility. That's a real gap in what the paper specifies, not
-something to pretend is more precise than it is: if patches vary a lot in
-how many sub-cracks they contain, a plain random split can still end up
-imbalanced across splits by chance. Flagging it here rather than adding
-stratification the paper never asked for.
+Sec. 4.1 gives the ratio: "we divide each dataset into the training,
+validation, and test set, with the proportion of 8:1:1." That's the only
+detail the paper gives -- but the paper's own ONPP/ORC/OCCSD are each a
+single-source dataset split on its own, which is NOT our situation. This
+project trains on a combined dataset pulled from multiple of
+DAGM/GC10-DET/KolektorSDD2/MPDD/MTD/Severstal/VisA, exactly like every
+other baseline here, so a plain unstratified random shuffle risks an
+unlucky split -- e.g. one source dataset landing almost entirely in test.
+So this stratifies by (dataset, size_bucket) the same way
+train_mask2former_runpod.py's `by_stratum` does: group records by stratum,
+shuffle within each group (seeded), take the paper's 80/10/10 from *each*
+group, then concatenate and shuffle each final split. The 8:1:1 ratio is
+the paper's; the stratification is this project's own established
+convention, not the paper's -- CrackDet's paper never needed it because it
+never combines datasets the way we are.
 
-Input: a single annotations JSON in the schema `dataset.py` / `slice_dataset.py`
-produce (list of {"image", "width", "height", "boxes"} records, one per
-patch) -- typically slice_dataset.py's own output.json.
+Input: a single annotations JSON in the schema `slice_dataset.py` produces
+(list of {"image", "width", "height", "dataset", "size_bucket", "boxes"}
+records, one per patch).
 
 Output: train.json / val.json / test.json in --output-dir, each a subset of
-the input records in the same schema, so `OrientedCrackDataset` can load
-them directly (paths are copied through unchanged -- images are NOT moved
-or duplicated, all three splits still point at the same images/ directory).
+the input records in the same schema -- OrientedCrackDataset loads these
+directly. Images are NOT moved/duplicated; all three splits point at the
+same images/ directory.
 
 Usage:
     python split_dataset.py --input sliced/annotations.json --output-dir sliced/
@@ -27,13 +35,18 @@ from __future__ import annotations
 
 import argparse
 import json
-import random
+from collections import Counter, defaultdict
 from pathlib import Path
+from random import Random
 
 TRAIN_RATIO = 0.8
 VAL_RATIO = 0.1
-# test gets the remainder, so it's exactly 1 - TRAIN_RATIO - VAL_RATIO = 0.1
+# test gets the remainder: 1 - TRAIN_RATIO - VAL_RATIO = 0.1
 SEED = 42
+
+
+def stratum_key(record: dict) -> str:
+    return f"{record.get('dataset', 'unknown')}_{record.get('size_bucket', 'unknown')}"
 
 
 def main():
@@ -47,17 +60,24 @@ def main():
     with open(args.input, "r") as f:
         records = json.load(f)
 
-    rng = random.Random(args.seed)
-    shuffled = records[:]
-    rng.shuffle(shuffled)
+    by_stratum = defaultdict(list)
+    for rec in records:
+        by_stratum[stratum_key(rec)].append(rec)
 
-    n = len(shuffled)
-    n_train = int(round(n * TRAIN_RATIO))
-    n_val = int(round(n * VAL_RATIO))
+    rng = Random(args.seed)
+    train, val, test = [], [], []
+    for _, group in sorted(by_stratum.items()):
+        group = list(group)
+        rng.shuffle(group)
+        n_train = int(round(len(group) * TRAIN_RATIO))
+        n_val = int(round(len(group) * VAL_RATIO))
+        train.extend(group[:n_train])
+        val.extend(group[n_train:n_train + n_val])
+        test.extend(group[n_train + n_val:])
 
-    train = shuffled[:n_train]
-    val = shuffled[n_train:n_train + n_val]
-    test = shuffled[n_train + n_val:]
+    rng.shuffle(train)
+    rng.shuffle(val)
+    rng.shuffle(test)
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -68,10 +88,22 @@ def main():
     def box_count(split):
         return sum(len(r.get("boxes", [])) for r in split)
 
-    print(f"Total patches: {n} (seed={args.seed})")
-    print(f"  train: {len(train)} patches, {box_count(train)} boxes -> {output_dir / 'train.json'}")
-    print(f"  val:   {len(val)} patches, {box_count(val)} boxes -> {output_dir / 'val.json'}")
-    print(f"  test:  {len(test)} patches, {box_count(test)} boxes -> {output_dir / 'test.json'}")
+    def print_stratum_counts(name, split):
+        counts = Counter(stratum_key(r) for r in split)
+        print(f"  {name}: total={len(split)} boxes={box_count(split)}")
+        for stratum, count in sorted(counts.items()):
+            print(f"    {stratum}: {count}")
+
+    print(f"Total patches: {len(records)} across {len(by_stratum)} stratum/strata (seed={args.seed})")
+    print_stratum_counts("train", train)
+    print_stratum_counts("val", val)
+    print_stratum_counts("test", test)
+    print(f"Written to {output_dir / 'train.json'}, {output_dir / 'val.json'}, {output_dir / 'test.json'}")
+
+    if any(k.endswith("_unknown") or k.startswith("unknown_") for k in by_stratum):
+        print("WARNING: some records had no 'dataset'/'size_bucket' field (grouped under "
+              "'unknown') -- set --input records' dataset/size_bucket if you want real "
+              "stratification across your source datasets.")
 
 
 if __name__ == "__main__":

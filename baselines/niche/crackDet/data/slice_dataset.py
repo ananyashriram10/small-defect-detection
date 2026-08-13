@@ -35,14 +35,27 @@ it is.
 Input JSON schema (full-resolution source images, box coords in full-image
 pixel space):
     [
-      {"image": "raw/img1.png",
+      {"image": "raw/img1.png", "dataset": "MPDD", "size_bucket": "small",
        "boxes": [{"cx": 4012.5, "cy": 2884.0, "h": 120.0, "w": 18.0, "theta_deg": 63.2, "label": 0}, ...]},
       ...
     ]
 
+`dataset` (and optionally `size_bucket`) name which of this project's
+source datasets (DAGM/GC10-DET/KolektorSDD2/MPDD/MTD/Severstal/VisA, the
+same set every other RunPod script in this repo pulls from) each image
+came from -- NOT something the CrackDet paper's own single-source ONPP/ORC/
+OCCSD ever needed, but this project trains on a combined multi-source
+dataset the same way every other baseline here does, so it needs the same
+stratification metadata `split_dataset.py` groups by. Both fields are
+carried through unchanged onto every patch sliced from that image (default
+"unknown" if omitted, so a quick test run without them doesn't hard-fail --
+but a real run should always set them).
+
 Output: `<output_dir>/images/<stem>_r{row}_c{col}.png` patches, plus an
 annotation JSON in the exact schema `dataset.py`/`OrientedCrackDataset`
-expects (box coords translated to patch-local, h/w/theta_deg untouched).
+expects (box coords translated to patch-local, h/w/theta_deg untouched),
+each record also carrying its `dataset`/`size_bucket` through for
+`split_dataset.py`.
 
 Usage:
     python slice_dataset.py --input raw_annotations.json --image-root /path/to/raw/images \
@@ -128,6 +141,8 @@ def main():
             img_path = image_root / img_path
         boxes = rec.get("boxes", [])
         stem = img_path.stem
+        dataset_name = rec.get("dataset", "unknown")
+        size_bucket = rec.get("size_bucket", "unknown")
 
         patches = slice_image(img_path, boxes, args.patch_size, args.keep_empty)
         for row, col, patch_img, patch_boxes in patches:
@@ -136,6 +151,7 @@ def main():
             sliced_records.append({
                 "image": f"images/{out_name}",
                 "width": args.patch_size, "height": args.patch_size,
+                "dataset": dataset_name, "size_bucket": size_bucket,
                 "boxes": patch_boxes,
             })
             total_patches += 1
@@ -148,6 +164,11 @@ def main():
     ann_out_path = output_dir / "annotations.json"
     with open(ann_out_path, "w") as f:
         json.dump(sliced_records, f)
+
+    unknown_dataset = sum(1 for r in sliced_records if r["dataset"] == "unknown")
+    if unknown_dataset:
+        print(f"WARNING: {unknown_dataset}/{total_patches} patch(es) have no 'dataset' field "
+              f"in the input JSON -- split_dataset.py can't stratify these by source dataset.")
 
     print(f"Sliced {len(records)} source image(s) -> {total_patches} patch(es), "
           f"{total_boxes} box(es) total.")
