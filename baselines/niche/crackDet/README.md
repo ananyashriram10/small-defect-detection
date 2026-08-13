@@ -86,10 +86,13 @@ requires `TRAIN_ANNOTATIONS` / `VAL_ANNOTATIONS` / `TEST_ANNOTATIONS` env
 vars pointing at files in that schema and exits with an explanatory error
 if they're not set. **This code has not been trained or run on real data.**
 
-There is still no automated train/val/test splitter — the paper states an
-8:1:1 ratio (Sec. 4.1) but doesn't describe the splitting procedure beyond
-that, and the three env vars above expect files you've already split
-yourself in that ratio.
+[`data/split_dataset.py`](data/split_dataset.py) does the 8:1:1 split
+(Sec. 4.1) — plain random shuffle at that ratio, seeded. The paper doesn't
+describe the splitting procedure beyond the ratio itself (no stratification
+variable, no seed given), so that's exactly what this does and nothing
+more; flagged in its own docstring that a plain random split can land
+imbalanced by chance if box density varies a lot patch-to-patch, since the
+paper gives no stratification rule to prevent that.
 
 **Preprocessing matches the paper exactly, not this project's other
 baseline scripts.** SegNeXt/PIDNet/GCNet resize raw images to a fixed size
@@ -153,6 +156,7 @@ baselines/niche/crackDet/
     target_generator.py   oriented boxes -> Gaussian heatmap + per-branch regression targets
     dataset.py               OrientedCrackDataset (documents the required JSON schema)
     slice_dataset.py        replicates the paper's Sec. 3.5 dataset construction (full-res images -> fixed-size patches)
+    split_dataset.py        paper's 8:1:1 train/val/test split (Sec. 4.1), seeded random shuffle
   train_crackdet_runpod.py  training script (Adam, paper's LR schedule, W&B logging)
   verify_architecture.py    shape/gradient/round-trip sanity checks (NOT yet run, see above)
   requirements.txt
