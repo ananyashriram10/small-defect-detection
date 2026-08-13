@@ -121,6 +121,29 @@ somewhere without spelling out the exact rule — `slice_dataset.py` defaults
 to dropping empty (0-box) patches as the closest match to that, flagged
 explicitly in its own docstring as an inferred, not verbatim, choice.
 
+**This project's actual images are frequently smaller than 512×512** (unlike
+the paper's own huge source images) — `slice_dataset.py` uses ceiling
+division so every image gets at least one tile, letting PIL's own
+`Image.crop()` zero-pad anything that runs past the edge. Still just a
+translation + pad, same as the plain-crop case — box angle/size are never
+touched.
+
+## Where the oriented-box annotations actually come from
+
+Neither this project nor the paper has real hand-labeled oriented sub-crack
+boxes. [`data/masks_to_annotations.py`](data/masks_to_annotations.py) is a
+practical bridge: it walks every one of this project's existing pixel masks
+(`processed_output/<dataset>/<size>/masks/`, all 7 source datasets, every
+defect class — not filtered to classes literally named "crack," since
+CrackDet's architecture is shape-based, not label-based) and derives
+oriented boxes per defect blob via skeletonization + segment-fitting.
+**This is heuristic auto-labeling, not verified ground truth, and not
+something the paper describes at all** — spot-check its output against
+source masks before trusting it at scale. Its docstring has the full
+algorithm and the specific limitation to know about (skeleton walking stops
+at branch points rather than jumping across them, so a Y-shaped crack only
+gets its first-explored branch converted to boxes).
+
 ## Verification status — be precise about what "faithful" means here
 
 This development environment has **no local Python/PyTorch/e2cnn runtime**
@@ -162,6 +185,7 @@ baselines/niche/crackDet/
     dataset.py               OrientedCrackDataset (documents the required JSON schema)
     slice_dataset.py        replicates the paper's Sec. 3.5 dataset construction (full-res images -> fixed-size patches)
     split_dataset.py        paper's 8:1:1 train/val/test split (Sec. 4.1), seeded random shuffle
+    masks_to_annotations.py heuristic oriented-box extraction from this project's existing pixel masks (NOT ground truth)
   train_crackdet_runpod.py  training script (Adam, paper's LR schedule, W&B logging)
   verify_architecture.py    shape/gradient/round-trip sanity checks (NOT yet run, see above)
   requirements.txt

@@ -18,6 +18,17 @@ exactly `input_size` x `input_size` and treat anything else as an error: in
 the paper's own pipeline, that's a dataset-construction-time invariant, not
 something the training-time loader should be resizing/padding to fix up.
 
+The paper's own source images (ONPP: 7360x4912, ORC: 3489x3489, OCCSD:
+4032x3024) were always much larger than 512x512, so pure tiling (floor
+division: only whole, fully-covered tiles) was enough. This project's actual
+source images are frequently *smaller* than 512x512 in at least one
+dimension (this repo's own MTD/KolektorSDD2/Severstal images all are), so
+this script uses ceiling division instead -- every image gets at least one
+tile, and PIL's `Image.crop()` zero-pads any tile that runs past the image
+edge automatically. Padding is still just a translation (place the crop
+window, fill what's outside with black) -- it never touches a box's angle or
+side lengths, same as the plain-crop case.
+
 One thing the paper does NOT specify precisely, and this script has to make
 an explicit choice about: how patches with zero annotated sub-cracks are
 handled. Exhaustive non-overlapping tiling of images at the paper's stated
@@ -73,9 +84,16 @@ from PIL import Image
 
 
 def slice_image(image_path: Path, boxes: list, patch_size: int, keep_empty: bool):
-    """Non-overlapping raster-order tiling; any partial edge tile is dropped
-    (the paper's "slice into 512x512 pixels" language implies whole patches,
-    not padded partial ones -- not explicitly stated either way).
+    """Non-overlapping raster-order tiling, using ceiling division so every image
+    produces at least one tile -- covers this project's actual images, most of
+    which are *smaller* than 512x512 in at least one dimension (unlike the
+    paper's own ONPP/ORC/OCCSD source images, which were always much larger).
+    A right/bottom edge tile that runs past the image boundary (whether because
+    the image doesn't divide evenly into patch_size, or because it's smaller
+    than patch_size outright) is zero-padded by PIL's own `Image.crop()`, which
+    already pads out-of-bounds crop regions with black automatically -- no
+    separate padding step needed. This is still a pure translation + pad, same
+    as plain cropping: box angle and side lengths are never touched.
 
     A box is assigned to the tile containing its center, with coordinates
     translated to that tile's local frame. h, w, theta_deg are copied through
@@ -84,7 +102,7 @@ def slice_image(image_path: Path, boxes: list, patch_size: int, keep_empty: bool
     """
     img = Image.open(image_path).convert("RGB")
     w, h = img.size
-    n_cols, n_rows = w // patch_size, h // patch_size
+    n_cols, n_rows = -(-w // patch_size), -(-h // patch_size)  # ceiling division
 
     patches = []
     for row in range(n_rows):
@@ -158,7 +176,7 @@ def main():
             total_boxes += len(patch_boxes)
 
         w, h = Image.open(img_path).size
-        n_tiles = (w // args.patch_size) * (h // args.patch_size)
+        n_tiles = -(-w // args.patch_size) * -(-h // args.patch_size)
         total_empty_dropped += n_tiles - len(patches)
 
     ann_out_path = output_dir / "annotations.json"

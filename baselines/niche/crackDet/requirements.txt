@@ -5,3 +5,9 @@ pillow
 shapely
 pandas
 wandb
+
+# only needed for data/masks_to_annotations.py (auto-generating oriented boxes from
+# this project's existing pixel masks) -- not needed for model/training code itself
+opencv-python
+scikit-image
+scipy
