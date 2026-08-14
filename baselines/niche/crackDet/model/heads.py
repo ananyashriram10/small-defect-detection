@@ -70,6 +70,14 @@ class CenterHead(nn.Module):
 class AngleBranchHead(nn.Module):
     """One of the 4 piecewise-angle branches: its own equivariant trunk + size/angle/std heads."""
 
+    # Bounds on predicted sigma (see forward()) -- MAX_STD chosen generously relative to the
+    # MAR loss's own "1/2" constant (Eq. 3): sigma^2 up to MAX_STD^2=100 already dwarfs 0.5,
+    # so term1 is already fully saturated toward 1 long before this ceiling, while still
+    # giving the "push other branches to high variance" term plenty of room to express real
+    # ambiguity before hitting the cap.
+    MIN_STD = 1e-3
+    MAX_STD = 10.0
+
     def __init__(self, gspace, backbone_out_type, trunk_mult: int = 8, hidden_channels: int = 64):
         super().__init__()
         trunk_type = enn.FieldType(gspace, trunk_mult * [gspace.regular_repr])
@@ -109,9 +117,20 @@ class AngleBranchHead(nn.Module):
         # ~45-degree local range -- left unbounded, matching the paper's framing
         # of this as regression (not classification into sub-bins).
         angle = self.angle_head(inv)
-        # sigma_i^2 must be strictly positive; softplus + small floor keeps the
-        # MAR-loss denominator (1/2 + sigma_i^2) well away from 0.
-        std = F.softplus(self.std_head(inv)) + 1e-3
+        # sigma_i must be bounded on BOTH ends. The lower bound (unchanged from
+        # before) keeps the MAR-loss denominator (1/2 + sigma_i^2) away from 0.
+        # The upper bound is new, added after a real RunPod smoke test showed
+        # training loss diverging to increasingly large negative values across
+        # epochs -- traced to model/losses.py's MARLoss: its "-sum_other" term
+        # (Eq. 3-4's own -sum_{j!=i} sigma_j^2) has no saturating denominator
+        # and is subtracted raw, so nothing in the paper's stated loss stops a
+        # non-valid branch's sigma from being driven toward infinity, which is
+        # always "free" reward with zero counterforce. The paper doesn't say
+        # what bounds this in practice; this is this implementation's own fix,
+        # not something the paper specifies -- a sigmoid-scaled range instead
+        # of unbounded softplus, so sigma can express "very uncertain" without
+        # the network having anywhere to run away to.
+        std = self.MIN_STD + (self.MAX_STD - self.MIN_STD) * torch.sigmoid(self.std_head(inv))
         return size, angle, std
 
 
