@@ -81,9 +81,14 @@ def check_gradients(model, size=512):
     x = torch.randn(2, 3, size, size, requires_grad=False)
 
     gen = CrackDetTargetGenerator(stride=model.output_stride, num_classes=model.num_classes)
+    # One box per branch (0:[0,45) 1:[45,90) 2:[90,135) 3:[135,180)) -- MARLoss/Lsize only
+    # backprop through the VALID branch's angle_head/size_head by design (Sec. 3.3), so a
+    # gradient-coverage check needs every branch to be "valid" for at least one instance,
+    # not just some random sample of angles.
     boxes_img0 = [OrientedBox(cx=100, cy=120, h=48, w=14, theta_deg=22.0),
-                  OrientedBox(cx=300, cy=200, h=60, w=10, theta_deg=97.0)]
-    boxes_img1 = [OrientedBox(cx=200, cy=256, h=30, w=9, theta_deg=161.0)]
+                  OrientedBox(cx=300, cy=200, h=60, w=10, theta_deg=65.0)]
+    boxes_img1 = [OrientedBox(cx=200, cy=256, h=30, w=9, theta_deg=110.0),
+                  OrientedBox(cx=150, cy=350, h=40, w=12, theta_deg=161.0)]
     targets = collate_targets([gen((size, size), boxes_img0), gen((size, size), boxes_img1)])
 
     criterion = CrackDetLoss()
