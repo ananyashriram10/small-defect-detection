@@ -91,7 +91,7 @@ def _fit_box(points: np.ndarray, width: float):
     if length < 1.0:
         return None
 
-    angle_deg = np.degrees(np.arctan2(direction[1], direction[0])) % 180.0
+    angle_deg = float(np.degrees(np.arctan2(direction[1], direction[0])) % 180.0)
     return {
         "cx": float(centroid[0]), "cy": float(centroid[1]),
         "h": max(length, 1.0), "w": max(width, 1.0),
@@ -170,7 +170,7 @@ def mask_to_oriented_boxes(mask: np.ndarray) -> list[dict]:
             edge_bc = box_pts[2] - box_pts[1]
             len_ab, len_bc = float(np.linalg.norm(edge_ab)), float(np.linalg.norm(edge_bc))
             long_edge, h_len, w_len = (edge_ab, len_ab, len_bc) if len_ab >= len_bc else (edge_bc, len_bc, len_ab)
-            angle_deg = np.degrees(np.arctan2(long_edge[1], long_edge[0])) % 180.0
+            angle_deg = float(np.degrees(np.arctan2(long_edge[1], long_edge[0])) % 180.0)
             boxes.append({"cx": float(cx), "cy": float(cy), "h": max(h_len, 1.0),
                            "w": max(w_len, 1.0), "theta_deg": angle_deg, "label": 0})
             continue
