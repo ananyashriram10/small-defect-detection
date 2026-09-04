@@ -1,5 +1,5 @@
 """
-Single-class mAP (mAP50, mAP50-95) computed the standard COCO way, simplified for
+DefectFormer's single-class mAP (mAP50, mAP50-95), computed the standard COCO way and simplified for
 one class ("defect") since there's nothing to average across classes here.
 
 For each IoU threshold: sort all predictions (across the whole eval set) by confidence

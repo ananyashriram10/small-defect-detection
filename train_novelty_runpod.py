@@ -33,8 +33,8 @@ import time
 from collections import Counter, defaultdict
 from pathlib import Path
 
-# novelty_experiments/*.py needs to be importable -- scp it next to this script.
-sys.path.insert(0, str(Path(__file__).parent / "novelty_experiments"))
+# DefectFormer modules live together under novelty_experiments/defectformer.
+sys.path.insert(0, str(Path(__file__).parent / "novelty_experiments" / "defectformer"))
 
 # ============================================================
 # Config
