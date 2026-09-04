@@ -172,6 +172,30 @@ if DEVICE.type != "cuda" and not ALLOW_CPU:
 if DEVICE.type == "cuda" and torch.cuda.device_count() != 1:
     raise RuntimeError(f"Expected one visible GPU after CUDA_VISIBLE_DEVICES=0, found {torch.cuda.device_count()}.")
 
+# FP16 can overflow on the first randomly-initialized PIDNet batch because the
+# official boundary term is deliberately multiplied by 20.  Prefer BF16 on
+# modern GPUs (same memory footprint, much larger exponent range), and retain
+# a dynamically-scaled FP16 fallback for older cards.  USE_AMP=0 remains an
+# escape hatch for a fully FP32 diagnostic run.
+USE_AMP = env_bool("USE_AMP", DEVICE.type == "cuda")
+REQUESTED_AMP_DTYPE = os.environ.get("AMP_DTYPE", "auto").strip().lower()
+if REQUESTED_AMP_DTYPE not in {"auto", "bfloat16", "bf16", "float16", "fp16"}:
+    raise ValueError("AMP_DTYPE must be auto, bfloat16/bf16, or float16/fp16")
+if DEVICE.type == "cuda" and USE_AMP:
+    bf16_supported = bool(getattr(torch.cuda, "is_bf16_supported", lambda: False)())
+    use_bfloat16 = REQUESTED_AMP_DTYPE in {"auto", "bfloat16", "bf16"} and bf16_supported
+    if use_bfloat16:
+        AMP_DTYPE = torch.bfloat16
+        USE_GRAD_SCALER = False
+    else:
+        if REQUESTED_AMP_DTYPE in {"bfloat16", "bf16"} and not bf16_supported:
+            print("BF16 is unavailable on this GPU; falling back to dynamically-scaled FP16.")
+        AMP_DTYPE = torch.float16
+        USE_GRAD_SCALER = True
+else:
+    AMP_DTYPE = torch.float32
+    USE_GRAD_SCALER = False
+
 random.seed(SEED)
 np.random.seed(SEED)
 torch.manual_seed(SEED)
@@ -182,7 +206,17 @@ if DEVICE.type == "cuda":
 print("torch:", torch.__version__, "| CUDA:", torch.version.cuda, "| device:", DEVICE)
 if DEVICE.type == "cuda":
     print("GPU:", torch.cuda.get_device_name(0))
-print({"run": RUN_NAME, "method": METHOD, "zoom": USE_ZOOM, "component_loss": USE_COMPONENT_LOSS})
+print(
+    {
+        "run": RUN_NAME,
+        "method": METHOD,
+        "zoom": USE_ZOOM,
+        "component_loss": USE_COMPONENT_LOSS,
+        "amp": USE_AMP,
+        "amp_dtype": str(AMP_DTYPE),
+        "grad_scaler": USE_GRAD_SCALER,
+    }
+)
 
 
 def initialize_wandb():
@@ -460,7 +494,9 @@ wandb.config.update({"parameters": total_parameters, "pretrained_backbone_loaded
 semantic_loss = OhemCrossEntropy(ignore_label=255, threshold=0.9, min_kept=131072, weights=(0.4, 1.0))
 boundary_loss = BoundaryLoss(coefficient=20.0)
 optimizer = AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
-scaler = torch.amp.GradScaler("cuda", enabled=DEVICE.type == "cuda")
+scaler = torch.amp.GradScaler(
+    "cuda", enabled=USE_GRAD_SCALER, init_scale=2.0**12, growth_interval=2000
+)
 
 RUN_DIR.mkdir(parents=True, exist_ok=True)
 FINAL_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -568,7 +604,7 @@ for epoch in range(start_epoch, MAX_EPOCHS + 1):
     model.train()
     epoch_start = time.perf_counter()
     running = defaultdict(float)
-    component_terms = zoom_samples = 0
+    component_terms = zoom_samples = successful_batches = 0
     schedule = distillation_schedule(epoch)
 
     for batch_index, batch in enumerate(train_loader, start=1):
@@ -578,7 +614,7 @@ for epoch in range(start_epoch, MAX_EPOCHS + 1):
         components = batch["components"].to(DEVICE, non_blocking=True)
         optimizer.zero_grad(set_to_none=True)
 
-        with torch.autocast(device_type=DEVICE.type, dtype=torch.float16, enabled=DEVICE.type == "cuda"):
+        with torch.autocast(device_type=DEVICE.type, dtype=AMP_DTYPE, enabled=USE_AMP):
             full_outputs = resize_pidnet_outputs(model(images), labels.shape[-2:])
             full_loss, full_parts = pidnet_loss(
                 full_outputs, labels, boundaries, semantic_loss, boundary_loss
@@ -630,13 +666,34 @@ for epoch in range(start_epoch, MAX_EPOCHS + 1):
                         total_loss = total_loss + schedule * DISTILLATION_WEIGHT * distillation_loss
                     zoom_samples += unique_zoom_samples
 
+        if not bool(torch.isfinite(total_loss.detach())):
+            raise FloatingPointError(
+                f"Non-finite loss at epoch {epoch}, batch {batch_index}: "
+                f"full={float(full_loss.detach())}, component={float(component_loss.detach())}, "
+                f"crop={float(crop_loss.detach())}, distillation={float(distillation_loss.detach())}."
+            )
+
         scaler.scale(total_loss).backward()
         scaler.unscale_(optimizer)
         gradient_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         if not bool(torch.isfinite(gradient_norm)):
+            if USE_GRAD_SCALER:
+                # GradScaler has recorded the offending gradients during
+                # unscale_. Calling step/update skips this batch and lowers
+                # the scale so the next batch can proceed safely.
+                scaler.step(optimizer)
+                scaler.update()
+                optimizer.zero_grad(set_to_none=True)
+                print(
+                    f"  epoch {epoch:02d} batch {batch_index}: AMP overflow; "
+                    f"skipped batch and reduced scale to {scaler.get_scale():.0f}",
+                    flush=True,
+                )
+                continue
             raise FloatingPointError(f"Non-finite gradient norm at epoch {epoch}, batch {batch_index}.")
         scaler.step(optimizer)
         scaler.update()
+        successful_batches += 1
 
         running["total_loss"] += float(total_loss.detach())
         running["full_loss"] += float(full_loss.detach())
@@ -659,7 +716,9 @@ for epoch in range(start_epoch, MAX_EPOCHS + 1):
 
     validation_rows = evaluate(val_loader)
     validation = next(row for row in validation_rows if row["group_type"] == "overall")
-    batches = max(len(train_loader), 1)
+    if successful_batches == 0:
+        raise FloatingPointError(f"No optimizer steps completed in epoch {epoch}; all gradients were non-finite.")
+    batches = successful_batches
     row = {
         "epoch": epoch,
         "train_total_loss": running["total_loss"] / batches,
