@@ -1,0 +1,57 @@
+{
+  "experiment": "ANZD_PIDNet_zoom_component_full",
+  "model": "ANZD-PIDNet (zoom_component)",
+  "method": "zoom_component",
+  "task": "binary semantic defect segmentation",
+  "deployed_architecture_changed": false,
+  "pretrained_backbone_loaded": false,
+  "configuration": {
+    "experiment": "ANZD_PIDNet_zoom_component_full",
+    "model": "ANZD-PIDNet (zoom_component)",
+    "method": "zoom_component",
+    "image_size": 640,
+    "crop_size": 320,
+    "batch_size": 4,
+    "max_epochs": 50,
+    "patience": 15,
+    "learning_rate": 6e-05,
+    "weight_decay": 0.01,
+    "seed": 42,
+    "target_crop_area_ratio": 0.08,
+    "small_component_max_area_ratio": 0.01,
+    "crop_context_scale": 1.5,
+    "crop_supervision_weight": 0.5,
+    "distillation_weight": 1.0,
+    "component_loss_weight": 0.5,
+    "distillation_temperature": 2.0,
+    "teacher_confidence": 0.55,
+    "distillation_start_epoch": 5,
+    "distillation_ramp_epochs": 5,
+    "deployed_architecture_changed": false,
+    "parameters": 7716549,
+    "pretrained_backbone_loaded": false
+  },
+  "best_epoch": 43,
+  "best_validation_dice": 0.6530388677331455,
+  "split_counts": {
+    "train": 8858,
+    "val": 1892,
+    "test": 1920
+  },
+  "metric_definitions": {
+    "FP_per_Image": "false-positive pixels divided by images, matching the existing segmentation baselines",
+    "component_metrics": "8-connected predicted components of at least 3 pixels, greedily matched one-to-one to ground-truth components at the stated IoU threshold",
+    "Inference_Time_ms": "model forward plus final bilinear upsampling; data loading and metric computation excluded"
+  },
+  "prediction_examples": [
+    "/workspace/anzd_pidnet_runs/final_outputs/ANZD_PIDNet_zoom_component_full/prediction_examples/small_DAGM_dagm_class9_0175_defect.png",
+    "/workspace/anzd_pidnet_runs/final_outputs/ANZD_PIDNet_zoom_component_full/prediction_examples/small_DAGM_dagm_class8_0098_defect.png",
+    "/workspace/anzd_pidnet_runs/final_outputs/ANZD_PIDNet_zoom_component_full/prediction_examples/small_Severstal_severstal_defect3_0661_defect.png",
+    "/workspace/anzd_pidnet_runs/final_outputs/ANZD_PIDNet_zoom_component_full/prediction_examples/medium_Severstal_severstal_defect3_1547_defect.png",
+    "/workspace/anzd_pidnet_runs/final_outputs/ANZD_PIDNet_zoom_component_full/prediction_examples/medium_GC10-DET_gc10_4_shuiban_0057_defect.png",
+    "/workspace/anzd_pidnet_runs/final_outputs/ANZD_PIDNet_zoom_component_full/prediction_examples/medium_Severstal_severstal_defect1_0837_defect.png",
+    "/workspace/anzd_pidnet_runs/final_outputs/ANZD_PIDNet_zoom_component_full/prediction_examples/large_GC10-DET_gc10_1_chongkong_0019_defect.png",
+    "/workspace/anzd_pidnet_runs/final_outputs/ANZD_PIDNet_zoom_component_full/prediction_examples/large_Severstal_severstal_defect3_0809_defect.png",
+    "/workspace/anzd_pidnet_runs/final_outputs/ANZD_PIDNet_zoom_component_full/prediction_examples/large_Severstal_severstal_defect3_4355_defect.png"
+  ]
+}

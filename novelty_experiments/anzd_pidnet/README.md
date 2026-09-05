@@ -2,152 +2,100 @@
 
 **Area-Normalized Zoom Distillation for small-defect semantic segmentation**
 
-## What we are trying to achieve
+## Goal
 
-Very small defects occupy so few pixels that their learning signal is easily overwhelmed by background and larger regions. ANZD-PIDNet is designed to improve recall for these small connected defects without turning segmentation into detection and without adding a second model at inference. The target is a better small-defect representation while preserving overall mask quality, false-positive behavior, and the lightweight inference cost of PIDNet-S.
+Tiny defects occupy very few pixels, so ordinary pixel-averaged training can let them contribute much less learning signal than larger defects and background. ANZD-PIDNet trains a lightweight segmentation model with a magnified view of small defects, while keeping the deployed model unchanged: one RGB image still produces one binary defect mask.
 
-The method changes training, not the deployed segmentation task: an RGB image still produces one binary defect mask.
+## PIDNet-S: the deployed segmentation model
 
-## Model architecture
+PIDNet-S is the segmentation network. It has three cooperating branches:
 
-ANZD-PIDNet uses PIDNet-S as its only segmentation network. PIDNet separates the features needed for dense prediction into three interacting branches:
+- **P branch:** preserves position, shape, and fine spatial detail.
+- **I branch:** learns wider semantic context and suppresses confusing texture.
+- **D branch:** focuses on defect boundaries and thin structures.
 
-- **P branch — spatial detail:** remains at high resolution to preserve defect position, shape, and thin structures.
-- **I branch — context:** progressively downsamples features to learn semantic context and suppress visually similar background texture.
-- **D branch — boundary detail:** learns transitions around defect borders and guides the final fusion.
-
-```mermaid
-flowchart TB
-    IMAGE["RGB image<br/>3 x 640 x 640"] --> STEM["Two stride-2 convolutions<br/>+ residual stages"]
-    STEM --> SHARED["Shared feature map<br/>1/8 resolution"]
-
-    subgraph PBRANCH["P branch — high-resolution spatial detail"]
-        P3["P stage 3<br/>1/8"] --> PAG3["PagFM 3"]
-        PAG3 --> P4["P stage 4<br/>1/8"] --> PAG4["PagFM 4"]
-        PAG4 --> P5["P stage 5<br/>1/8"]
-        PAG3 --> P_AUX["Auxiliary semantic head"]
-    end
-
-    subgraph IBRANCH["I branch — semantic context"]
-        I3["I stage 3<br/>1/16"] --> I4["I stage 4<br/>1/32"]
-        I4 --> I5["I stage 5<br/>1/64"] --> PAPPM["PAPPM<br/>multi-scale context<br/>upsampled to 1/8"]
-    end
-
-    subgraph DBRANCH["D branch — boundary detail"]
-        D3["D stage 3<br/>1/8"] --> ADD3(("+")) --> D4["D stage 4<br/>1/8"]
-        D4 --> ADD4(("+")) --> D5["D stage 5<br/>1/8"]
-        ADD4 --> D_AUX["Boundary head"]
-    end
-
-    SHARED --> P3
-    SHARED --> I3
-    SHARED --> D3
-
-    I3 -- "compress + upsample" --> PAG3
-    I4 -- "compress + upsample" --> PAG4
-    I3 -- "Diff 3 + upsample" --> ADD3
-    I4 -- "Diff 4 + upsample" --> ADD4
-
-    P5 --> BAG["LightBag<br/>boundary-guided fusion"]
-    PAPPM --> BAG
-    D5 --> BAG
-    BAG --> FINAL["Final 2-class head<br/>1/8 logits"]
-    FINAL --> UPSAMPLE["Bilinear upsampling"]
-    UPSAMPLE --> MASK["Binary defect mask<br/>640 x 640"]
-```
-
-### How the PIDNet-S parts interact
-
-1. The stem and first residual stages reduce the image to a shared `1/8` feature map.
-2. The **I branch** continues to `1/16`, `1/32`, and `1/64` resolution. PAPPM pools this deep feature at several spatial scales, combines local and global context, and returns it to `1/8` resolution.
-3. The **P branch** stays at `1/8` resolution. Two PagFM modules selectively inject context from the I branch while retaining high-resolution spatial information.
-4. The **D branch** also stays at `1/8`. Difference features from I stages 3 and 4 are compressed, upsampled, and added to the D stream so it can focus on semantic boundaries rather than arbitrary image edges.
-5. **LightBag** uses the D feature as boundary attention to combine P-branch detail with PAPPM context. The final head predicts background and defect logits, which are upsampled to the input resolution.
-6. The auxiliary P semantic head and D boundary head supply training supervision. The final semantic head is the prediction used for evaluation.
-
-The exact small configuration is `m=2`, `n=3`, base width `32`, PAPPM width `96`, head width `128`, and two output classes. It contains **7,716,549 parameters**.
-
-## ANZD training experiment and flow
-
-ANZD adds a second view of small defects during training. The full image and the zoom crop are processed by the same PIDNet-S instance, so there is one parameter set and one optimizer update.
+PagFM transfers useful context into the spatial branch, and LightBag uses boundary information to fuse the three streams before the two-class segmentation head.
 
 ```mermaid
 flowchart LR
-    IMAGE["Training image"] --> FULL["Full-image view<br/>640 x 640"]
-    GT["Binary ground-truth mask"] --> COMPONENTS["8-connected components"]
-
-    FULL --> PID_FULL["Shared PIDNet-S"]
-    GT --> FULL_LOSS["Full-image PID loss"]
-    PID_FULL --> FULL_LOGITS["Full-image logits"]
-    FULL_LOGITS --> FULL_LOSS
-
-    subgraph ANZD["Training-only ANZD path"]
-        COMPONENTS --> FILTER["Eligible components<br/>area <= 1% of image"]
-        FILTER --> SAMPLE["Inverse-sqrt area sampling"]
-        SAMPLE --> NORMALIZE["Area-normalized context crop<br/>target occupancy = 8%"]
-        IMAGE --> NORMALIZE
-        GT --> NORMALIZE
-        NORMALIZE --> ZOOM["Zoom view<br/>320 x 320"]
-        ZOOM --> PID_ZOOM["Same PIDNet-S weights"]
-        PID_ZOOM --> ZOOM_LOGITS["Zoom logits"]
-        ZOOM_LOGITS --> CROP_LOSS["Zoom PID loss"]
-
-        ZOOM_LOGITS --> DETACH["Detach local teacher"]
-        GT --> GATE{"Correct class and<br/>confidence >= 0.55?"}
-        DETACH --> GATE
-        FULL_LOGITS --> ROI["Matching full-image ROI"]
-        GATE --> KD["Quality-gated KL distillation"]
-        ROI --> KD
-
-        COMPONENTS --> COMP_LOSS["Equal-per-component<br/>recall loss"]
-        FULL_LOGITS --> COMP_LOSS
-    end
-
-    FULL_LOSS --> TOTAL["Weighted total loss"]
-    CROP_LOSS --> TOTAL
-    KD --> TOTAL
-    COMP_LOSS --> TOTAL
-    TOTAL -. "single optimizer update" .-> PID_FULL
-    TOTAL -. "shared parameters" .-> PID_ZOOM
-
-    TOTAL -. "trained weights" .-> INFER["Inference:<br/>one full-image PIDNet-S pass"]
-    INFER --> PREDICTION["Binary segmentation mask"]
+    IMAGE["Input image"] --> SHARED["Shared image features"]
+    SHARED --> P["P branch<br/>Preserves position and shape"]
+    SHARED --> I["I branch<br/>Understands context"]
+    SHARED --> D["D branch<br/>Finds boundaries"]
+    P --> PAG["PagFM<br/>Context-aware spatial fusion"]
+    I --> PAG
+    PAG --> BAG["LightBag<br/>Boundary-guided fusion"]
+    I --> BAG
+    D --> BAG
+    BAG --> HEAD["Two-class segmentation head"]
+    HEAD --> MASK["Background / defect mask"]
 ```
 
-### Area-normalized zoom
+The P branch stays relatively high resolution so a tiny crack or spot is less likely to disappear. The I branch supplies global context, while the D branch encourages a sharp outline instead of a blurry blob. PIDNet-S has **7,716,549 parameters**.
 
-For an eligible component with area `A`, width `w`, and height `h`, the square crop side is
+## ANZD training flow
+
+ANZD means **Area-Normalized Zoom Distillation**. During training, a ground-truth connected component is selected when it occupies at most 1% of the image. A context crop is chosen so that the defect occupies about 8% of the crop, then resized to `320 x 320`.
+
+The full image and the zoom crop go through the **same PIDNet-S weights**. The two PIDNet boxes below are two forward passes through one model, not two separately trained networks.
+
+```mermaid
+flowchart TB
+    IMAGE["Training image"] --> FULL["Full image<br/>640 x 640"]
+    GT["Ground-truth mask"] --> COMPONENTS["Find connected defects"]
+    COMPONENTS --> SMALL["Select small component<br/>area <= 1%"]
+    SMALL --> CROP["Area-normalized context crop<br/>target occupancy = 8%"]
+    IMAGE --> CROP
+    CROP --> ZOOM["Zoom crop<br/>320 x 320"]
+
+    FULL --> MODEL1["Shared PIDNet-S"]
+    ZOOM --> MODEL2["Same PIDNet-S weights"]
+    MODEL1 --> FULLPRED["Full-image logits"]
+    MODEL2 --> ZOOMPRED["Zoom logits"]
+
+    FULLPRED --> FULLLOSS["Normal PIDNet loss"]
+    ZOOMPRED --> ZOOMLOSS["Zoom PIDNet loss"]
+    ZOOMPRED --> GATE{"Correct class and<br/>confidence >= 0.55?"}
+    FULLPRED --> ROI["Matching full-image region"]
+    GATE --> DISTILL["Quality-gated local distillation"]
+    ROI --> DISTILL
+    COMPONENTS --> COMPLOSS["One equal recall term<br/>per eligible component"]
+    FULLPRED --> COMPLOSS
+
+    FULLLOSS --> TOTAL["Weighted total loss"]
+    ZOOMLOSS --> TOTAL
+    DISTILL --> TOTAL
+    COMPLOSS --> TOTAL
+    TOTAL --> UPDATE["One optimizer update<br/>to shared weights"]
+```
+
+The zoom prediction is used as a detached local teacher only when it agrees with the ground truth and is confident enough. Distillation starts after the model has learned basic segmentation and ramps in gradually. The component-balanced term gives every eligible small defect one recall-oriented term, so a 20-pixel defect is not completely dominated by a 5,000-pixel defect.
+
+Conceptually:
 
 ```text
-s = max(sqrt(A / r_target), context_scale * max(w, h), minimum_side)
+Total loss = full-image PID loss
+           + 0.5 x zoom PID loss
+           + quality-gated zoom-to-full distillation
+           + 0.5 x component-balanced recall loss
 ```
 
-The default target occupancy is `r_target=0.08`, context scale is `1.5`, and minimum side is `24` pixels. The crop is clipped to the image, lightly jittered, and resized to `320 x 320`. RGB uses bilinear interpolation; the mask uses nearest-neighbor interpolation. Sampling components with inverse-square-root area weighting favors the smallest defects without selecting the same component deterministically.
+## Inference
 
-### Shared-weight zoom supervision
+All zooming, connected-component selection, teacher gating, and component loss are training-only.
 
-The zoom view receives the same PID loss as the full view: auxiliary semantic supervision, final semantic supervision with online hard-example mining, weighted boundary supervision, and boundary-aware semantic supervision. Because the zoom pass uses the same model weights, it learns a higher-resolution local representation without introducing a separate teacher network.
-
-The zoom final logits then act as a detached local teacher for the corresponding full-image ROI. A pixel contributes to distillation only when the teacher predicts its ground-truth class correctly and has at least `0.55` confidence. Distillation starts at epoch 5 and ramps over five epochs, reducing the risk of reinforcing poor early predictions.
-
-### Component-balanced recall
-
-Pixel-averaged losses allow a large component to contribute far more foreground gradient than a tiny component. The component loss instead computes one recall-oriented probability penalty per eligible connected component and averages those terms. Every small component therefore receives equal weight, while the ordinary PID losses continue to constrain background and boundary errors.
-
-### Training objective
-
-```text
-L_total = L_PID(full)
-        + 0.5 * L_PID(zoom)
-        + alpha(epoch) * 1.0 * L_KD(zoom -> full ROI)
-        + 0.5 * L_component
+```mermaid
+flowchart LR
+    IMAGE["Full image"] --> PID["One PIDNet-S pass"]
+    PID --> UPSAMPLE["Upsample logits"]
+    UPSAMPLE --> MASK["Binary defect mask"]
 ```
 
-`alpha(epoch)` is the distillation warm-up. The zoom PID loss, distillation loss, and component loss exist only during training; validation and inference use the full-image PIDNet-S path.
+This preserves PIDNet-S's lightweight single-pass deployment behavior.
 
-### Experiment design
+## Controlled experiment
 
-The experiment separates the two proposed contributions with four controlled modes:
+The four modes isolate the two training contributions while keeping the model, split, seed, optimizer, and evaluation protocol fixed.
 
 | Mode | Full PID loss | Component loss | Zoom PID loss | Zoom-to-full distillation |
 |---|---:|---:|---:|---:|
@@ -156,12 +104,25 @@ The experiment separates the two proposed contributions with four controlled mod
 | `zoom` | yes | no | yes | yes |
 | `zoom_component` | yes | yes | yes | yes |
 
-All modes use the same PIDNet-S initialization, optimizer, image size, data split, seed, epoch limit, and early-stopping rule. The 12,670 paired samples are stratified within each `(dataset, size)` group into 8,858 training, 1,892 validation, and 1,920 test samples. The best checkpoint is selected using validation Dice before the test set is evaluated.
+The benchmark contains 12,670 paired images with a fixed size-stratified 70/15/15 split: 8,858 train, 1,892 validation, and 1,920 test images. Evaluation includes overall and size-bucket recall, Dice, IoU, precision, false-positive pixels per image, connected-component metrics, latency, throughput, memory, parameters, and MACs.
 
-The comparison is intended to answer three questions:
+## Completed `zoom_component` run
 
-1. Does area-normalized zoom distillation improve small-defect and component recall over the PIDNet-S baseline?
-2. Does equal-per-component supervision add recall beyond zoom training without an unacceptable increase in false positives?
-3. Does the complete method preserve overall Dice and the single-pass inference behavior of PIDNet-S?
+The best checkpoint was selected at epoch 43. ANZD-PIDNet substantially improved small-defect recall while keeping overall Dice and IoU at the PIDNet-S baseline level.
 
-The primary evaluation measures are small/medium/large recall, pixel Dice and IoU, precision, specificity, false-positive pixels per image, component precision/recall/F1 at IoU `0.10` and `0.50`, mean best-component IoU, latency, throughput, memory, parameters, and MACs. Results will be added only after the controlled runs are completed.
+| Metric | PIDNet-S baseline | ANZD-PIDNet |
+|---|---:|---:|
+| Precision | 0.739 | 0.678 |
+| Recall | 0.586 | 0.631 |
+| Recall — small | 0.414 | **0.657** |
+| Recall — medium | 0.607 | 0.664 |
+| Recall — large | 0.586 | 0.622 |
+| Dice | 0.654 | 0.654 |
+| IoU | 0.486 | 0.486 |
+| False-positive pixels/image | 5,290.07 | 7,522.64 |
+| Inference time/image | 6.836 ms | 3.757 ms* |
+| Parameters | 7,716,549 | 7,716,549 |
+
+\*Measured on the completed run's GPU; batch-1 latency was 7.930 ms. The deployed architecture is unchanged, so training-time zoom passes do not add inference passes.
+
+Complete checkpoints, histories, metrics, metadata, and prediction examples are stored in [`results/ANZD_PIDNet_zoom_component_full`](results/ANZD_PIDNet_zoom_component_full). The shared baseline report is [`baselines_small_defect_detection.pdf`](../../baselines_small_defect_detection.pdf).
