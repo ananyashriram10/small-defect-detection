@@ -1,0 +1,8 @@
+# Use a RunPod PyTorch image so the CUDA-matched torch build is already present.
+# The trainer installs these lightweight runtime dependencies automatically.
+numpy>=1.26
+pandas>=2.2
+Pillow>=10.0
+opencv-python-headless>=4.9
+wandb>=0.18
+huggingface-hub>=0.25
