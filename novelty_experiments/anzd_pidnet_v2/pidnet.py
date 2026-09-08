@@ -520,10 +520,18 @@ def hard_negative_suppression_loss(
     """Penalize only the highest-confidence background false positives."""
     if not 0.0 < fraction <= 1.0:
         raise ValueError("fraction must be in (0, 1]")
-    probabilities = F.softmax(logits.float(), dim=1)[:, 1]
-    background = probabilities[target == 0]
-    if background.numel() == 0:
+    logits_float = logits.float()
+    probabilities = F.softmax(logits_float, dim=1)[:, 1]
+    background_probabilities = probabilities[target == 0]
+    if background_probabilities.numel() == 0:
         return logits.sum() * 0.0
-    count = max(1, min(background.numel(), int(background.numel() * fraction)))
-    hardest = torch.topk(background, k=count, largest=True).values.clamp(1e-5, 1.0 - 1e-5)
-    return F.binary_cross_entropy(hardest, torch.zeros_like(hardest), reduction="mean")
+    count = max(1, min(background_probabilities.numel(), int(background_probabilities.numel() * fraction)))
+    hardest_indices = torch.topk(background_probabilities, k=count, largest=True).indices
+    # For two classes, foreground probability is sigmoid(logit_fg - logit_bg).
+    # Select by probability, then use BCE-with-logits so the term is safe inside
+    # torch.autocast (plain probability BCE is intentionally disallowed there).
+    background_margins = (logits_float[:, 1] - logits_float[:, 0])[target == 0]
+    hardest_margins = background_margins[hardest_indices]
+    return F.binary_cross_entropy_with_logits(
+        hardest_margins, torch.zeros_like(hardest_margins), reduction="mean"
+    )
