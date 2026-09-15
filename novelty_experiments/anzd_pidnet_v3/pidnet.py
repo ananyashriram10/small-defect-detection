@@ -335,7 +335,10 @@ class ShapeRefinementHead(nn.Module):
         boundary_logits = self.boundary_head(fused)
         distance_logits = self.distance_head(fused)
         gate = self.shape_gate(torch.cat([fused, boundary_logits, distance_logits], dim=1))
-        correction = self.semantic_correction(fused) * gate
+        # Gate the shared refinement features before projecting to the
+        # two-class correction map; the gate has ``refine_channels`` while the
+        # semantic projection has ``num_classes`` output channels.
+        correction = self.semantic_correction(fused * gate)
         return coarse_quarter + correction, boundary_logits, distance_logits
 
 
