@@ -408,7 +408,11 @@ class PIDNet(nn.Module):
 
         if augment:
             self.seghead_p = SegmentHead(planes * 2, head_planes, num_classes)
-            self.seghead_d = SegmentHead(planes * 2, planes, 1)
+            # The shape head replaces PIDNet's auxiliary D segmentation head
+            # in v3. Keep the old head only for the explicit shape_refine=False
+            # compatibility path so it is not an unused trainable parameter.
+            if not shape_refine:
+                self.seghead_d = SegmentHead(planes * 2, planes, 1)
         self.final_layer = SegmentHead(planes * 4, head_planes, num_classes)
         if shape_refine:
             self.shape_head = ShapeRefinementHead(planes, num_classes, max(planes, 32))
@@ -493,9 +497,15 @@ class PIDNet(nn.Module):
             final, boundary_logits, distance_logits = self.shape_head(quarter_features, coarse_quarter)
         else:
             final = coarse_quarter
-            boundary_logits = F.interpolate(
-                self.seghead_d(auxiliary_d), size=quarter_size, mode="bilinear", align_corners=ALIGN_CORNERS
-            )
+            if self.augment:
+                boundary_logits = F.interpolate(
+                    self.seghead_d(auxiliary_d), size=quarter_size, mode="bilinear", align_corners=ALIGN_CORNERS
+                )
+            else:
+                boundary_logits = torch.zeros(
+                    final.shape[0], 1, quarter_size[0], quarter_size[1],
+                    device=final.device, dtype=final.dtype,
+                )
             distance_logits = torch.zeros_like(boundary_logits)
         if self.augment:
             return [self.seghead_p(auxiliary_p), final, boundary_logits, distance_logits]
