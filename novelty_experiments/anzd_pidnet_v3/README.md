@@ -136,4 +136,30 @@ prediction panels, `summary.csv`, and
 `run_metadata.json` under the configured run directory. The prediction panels use
 green for true positives, red for false positives, and blue for false negatives.
 
-Results are intentionally not included until the v3 experiment has been run.
+## Completed `zoom_component` run
+
+The completed run reached its best validation Dice at epoch 40. Test metrics are
+reported on the fixed 1,920-image test split at the calibrated operating point.
+
+| Metric | Result |
+|---|---:|
+| Precision | 0.649 |
+| Recall | 0.671 |
+| Recall — small | **0.687** |
+| Recall — medium | 0.697 |
+| Recall — large | 0.664 |
+| Dice | 0.660 |
+| IoU | 0.492 |
+| False-positive pixels/image | 9,142.83 |
+| Component recall — IoU 0.10 | 0.724 |
+| Component recall — IoU 0.50 | 0.474 |
+| Inference time/image | 6.768 ms |
+| Batch-1 latency | 8.855 ms |
+| Throughput | 147.76 images/s |
+| Peak inference memory | 648.01 MB |
+| Parameters | 12,062,048 |
+| Convolution MACs at 640 | 15.734 G |
+
+mAP is intentionally blank because this is binary semantic segmentation. The
+complete metrics, metadata, training history, and deterministic prediction
+examples are stored in [`results/ANZD_PIDNet_v3_zoom_component_full`](results/ANZD_PIDNet_v3_zoom_component_full).
