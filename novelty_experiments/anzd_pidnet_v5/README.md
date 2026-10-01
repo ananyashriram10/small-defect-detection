@@ -1,6 +1,6 @@
 # ANZD-PIDNet v5
 
-**Pretrained, recipe-first ANZD-PIDNet. Target: beat SegFormer-B0.**
+**Pretrained, recipe-first ANZD-PIDNet.**
 
 ## Why v5 exists
 
@@ -145,24 +145,12 @@ report, where `core_coverage` should be 1.0.
 ## Go / no-go checkpoints
 
 - **Epoch 1:** `core_coverage` printed ≥ 0.95 (enforced), and loss is finite.
-- **Epoch ~20 of run A:** EMA val Dice should be ≥ 0.70 and rising
-  smoothly. If it isn't, fix the recipe before spending GPU time on B and C.
+- **During run A:** inspect EMA validation trends and training stability
+  before proceeding to B and C.
   `clipped_batch_fraction` near 1.0 in `training_history.csv` means
   `GRAD_CLIP_NORM` is throttling SGD; raise it.
 - **After A:** if A alone reaches SegFormer-level Dice, the paper's claim for
   ANZD rests on B − A (small recall, FP/image) and the speed advantage.
-
-## Target (SegFormer-B0 test numbers)
-
-| Metric | SegFormer-B0 | v5 target |
-|---|---:|---:|
-| Dice / IoU | 0.757 / 0.609 | ≥ 0.76 / ≥ 0.61 |
-| Precision | 0.786 | ≥ 0.78 |
-| Recall — small | 0.512 | ≥ 0.60 |
-| FP pixels / image | 5,063 | < 5,000 |
-| Inference | 22.99 ms | < 8 ms |
-
-These are targets, not results.
 
 ## Outputs
 
