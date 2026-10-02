@@ -1,0 +1,255 @@
+{
+  "experiment": "ANZD_PIDNet_v4_zoom_component_full",
+  "model": "ANZD-PIDNet v4 (zoom_component)",
+  "method": "zoom_component",
+  "task": "binary semantic defect segmentation",
+  "deployed_architecture_changed": true,
+  "pretrained_backbone_loaded": false,
+  "configuration": {
+    "experiment": "ANZD_PIDNet_v4_zoom_component_full",
+    "model": "ANZD-PIDNet v4 (zoom_component)",
+    "method": "zoom_component",
+    "image_size": 640,
+    "crop_size": 320,
+    "batch_size": 4,
+    "max_epochs": 50,
+    "patience": 15,
+    "learning_rate": 6e-05,
+    "weight_decay": 0.01,
+    "model_width": 40,
+    "distance_loss_weight": 0.25,
+    "seed": 42,
+    "target_crop_area_ratio": 0.08,
+    "small_component_max_area_ratio": 0.01,
+    "crop_context_scale": 1.5,
+    "crop_supervision_weight": 0.35,
+    "distillation_weight": 0.5,
+    "component_loss_weight": 0.3,
+    "distillation_temperature": 2.0,
+    "teacher_confidence": 0.55,
+    "distillation_start_epoch": 5,
+    "distillation_ramp_epochs": 5,
+    "prediction_threshold_initial": 0.5,
+    "calibrate_threshold": true,
+    "calibration_min_small_recall": 0.55,
+    "edge_refine": true,
+    "deployed_architecture_changed": true,
+    "parameters": 12065090,
+    "pretrained_backbone_loaded": false
+  },
+  "best_epoch": 46,
+  "best_validation_dice": 0.6425833793078696,
+  "prediction_threshold": 0.575,
+  "split_counts": {
+    "train": 8858,
+    "val": 1892,
+    "test": 1920
+  },
+  "metric_definitions": {
+    "FP_per_Image": "false-positive pixels divided by images, matching the existing segmentation baselines",
+    "component_metrics": "8-connected predicted components of at least 3 pixels, greedily matched one-to-one to ground-truth components at the stated IoU threshold",
+    "Inference_Time_ms": "model forward plus final bilinear upsampling; data loading and metric computation excluded"
+  },
+  "prediction_examples": [
+    "/workspace/anzd_pidnet_v4_runs/final_outputs/ANZD_PIDNet_v4_zoom_component_full/prediction_examples/small_DAGM_dagm_class9_0175_defect.png",
+    "/workspace/anzd_pidnet_v4_runs/final_outputs/ANZD_PIDNet_v4_zoom_component_full/prediction_examples/small_DAGM_dagm_class8_0098_defect.png",
+    "/workspace/anzd_pidnet_v4_runs/final_outputs/ANZD_PIDNet_v4_zoom_component_full/prediction_examples/small_Severstal_severstal_defect3_0661_defect.png",
+    "/workspace/anzd_pidnet_v4_runs/final_outputs/ANZD_PIDNet_v4_zoom_component_full/prediction_examples/medium_Severstal_severstal_defect3_1547_defect.png",
+    "/workspace/anzd_pidnet_v4_runs/final_outputs/ANZD_PIDNet_v4_zoom_component_full/prediction_examples/medium_GC10-DET_gc10_4_shuiban_0057_defect.png",
+    "/workspace/anzd_pidnet_v4_runs/final_outputs/ANZD_PIDNet_v4_zoom_component_full/prediction_examples/medium_Severstal_severstal_defect1_0837_defect.png",
+    "/workspace/anzd_pidnet_v4_runs/final_outputs/ANZD_PIDNet_v4_zoom_component_full/prediction_examples/large_GC10-DET_gc10_1_chongkong_0019_defect.png",
+    "/workspace/anzd_pidnet_v4_runs/final_outputs/ANZD_PIDNet_v4_zoom_component_full/prediction_examples/large_Severstal_severstal_defect3_0809_defect.png",
+    "/workspace/anzd_pidnet_v4_runs/final_outputs/ANZD_PIDNet_v4_zoom_component_full/prediction_examples/large_Severstal_severstal_defect3_4355_defect.png"
+  ],
+  "threshold_calibration": [
+    {
+      "threshold": 0.3,
+      "dice": 0.6110808382811516,
+      "small_recall": 0.7917952692295056,
+      "precision": 0.5147622433540712,
+      "recall": 0.751741230549891,
+      "fp_pixels": 31385658,
+      "selected": false
+    },
+    {
+      "threshold": 0.325,
+      "dice": 0.6168668715145276,
+      "small_recall": 0.7806969566368586,
+      "precision": 0.5276346729314072,
+      "recall": 0.742423615372234,
+      "fp_pixels": 29438212,
+      "selected": false
+    },
+    {
+      "threshold": 0.35,
+      "dice": 0.6218953205998341,
+      "small_recall": 0.769916566973509,
+      "precision": 0.5399346932613415,
+      "recall": 0.7331918642425956,
+      "fp_pixels": 27670108,
+      "selected": false
+    },
+    {
+      "threshold": 0.375,
+      "dice": 0.6263625554199376,
+      "small_recall": 0.7592009214933294,
+      "precision": 0.5518875364129516,
+      "recall": 0.7240733642475515,
+      "fp_pixels": 26039580,
+      "selected": false
+    },
+    {
+      "threshold": 0.4,
+      "dice": 0.6303596999334276,
+      "small_recall": 0.7482968414501924,
+      "precision": 0.5636867075720976,
+      "recall": 0.7149206811947372,
+      "fp_pixels": 24509445,
+      "selected": false
+    },
+    {
+      "threshold": 0.425,
+      "dice": 0.6340003037353997,
+      "small_recall": 0.7371357173365596,
+      "precision": 0.5755298143657611,
+      "recall": 0.7056948003392206,
+      "fp_pixels": 23052140,
+      "selected": false
+    },
+    {
+      "threshold": 0.45,
+      "dice": 0.6372757310273699,
+      "small_recall": 0.725793889308706,
+      "precision": 0.5874493037142156,
+      "recall": 0.696337899480903,
+      "fp_pixels": 21659176,
+      "selected": false
+    },
+    {
+      "threshold": 0.475,
+      "dice": 0.6401558035639545,
+      "small_recall": 0.7143322362254334,
+      "precision": 0.5994710892944872,
+      "recall": 0.6867649499569292,
+      "fp_pixels": 20323042,
+      "selected": false
+    },
+    {
+      "threshold": 0.5,
+      "dice": 0.6425833793078696,
+      "small_recall": 0.7022608282230524,
+      "precision": 0.6115891541215907,
+      "recall": 0.6768867687566039,
+      "fp_pixels": 19039808,
+      "selected": false
+    },
+    {
+      "threshold": 0.525,
+      "dice": 0.644442187773819,
+      "small_recall": 0.6902039151870527,
+      "precision": 0.6235720620699304,
+      "recall": 0.6667576784935305,
+      "fp_pixels": 17826997,
+      "selected": false
+    },
+    {
+      "threshold": 0.55,
+      "dice": 0.6456869985667895,
+      "small_recall": 0.6775546411916022,
+      "precision": 0.6354082351885508,
+      "recall": 0.6563037814477076,
+      "fp_pixels": 16679149,
+      "selected": false
+    },
+    {
+      "threshold": 0.575,
+      "dice": 0.6462288602499431,
+      "small_recall": 0.6645101377794871,
+      "precision": 0.6470537065490424,
+      "recall": 0.645406114256261,
+      "fp_pixels": 15592521,
+      "selected": true
+    },
+    {
+      "threshold": 0.6,
+      "dice": 0.6461558590906836,
+      "small_recall": 0.6507718086432518,
+      "precision": 0.6586722676655568,
+      "recall": 0.6341062655535453,
+      "fp_pixels": 14553894,
+      "selected": false
+    },
+    {
+      "threshold": 0.625,
+      "dice": 0.6453445954152673,
+      "small_recall": 0.6361473538955705,
+      "precision": 0.6701560779322759,
+      "recall": 0.6223047341931975,
+      "fp_pixels": 13565962,
+      "selected": false
+    },
+    {
+      "threshold": 0.65,
+      "dice": 0.6437156570205353,
+      "small_recall": 0.620417416378539,
+      "precision": 0.6815521212617445,
+      "recall": 0.6098592337616985,
+      "fp_pixels": 12620712,
+      "selected": false
+    },
+    {
+      "threshold": 0.675,
+      "dice": 0.6412357442485297,
+      "small_recall": 0.6034273831174227,
+      "precision": 0.6929633153004352,
+      "recall": 0.5966943538145617,
+      "fp_pixels": 11709731,
+      "selected": false
+    },
+    {
+      "threshold": 0.7,
+      "dice": 0.6378379504630827,
+      "small_recall": 0.5851550284971039,
+      "precision": 0.7045592691225964,
+      "recall": 0.5826603797837061,
+      "fp_pixels": 10821396,
+      "selected": false
+    },
+    {
+      "threshold": 0.725,
+      "dice": 0.6333493207006675,
+      "small_recall": 0.5650698367480254,
+      "precision": 0.7164503828401729,
+      "recall": 0.567522410392354,
+      "fp_pixels": 9948118,
+      "selected": false
+    },
+    {
+      "threshold": 0.75,
+      "dice": 0.627623898866093,
+      "small_recall": 0.5429940029492425,
+      "precision": 0.7288208185627871,
+      "recall": 0.5511031182060749,
+      "fp_pixels": 9082040,
+      "selected": false
+    },
+    {
+      "threshold": 0.775,
+      "dice": 0.6203849183767838,
+      "small_recall": 0.5185081394067886,
+      "precision": 0.7418123582613633,
+      "recall": 0.5331186077371523,
+      "fp_pixels": 8218266,
+      "selected": false
+    },
+    {
+      "threshold": 0.8,
+      "dice": 0.6111988645166815,
+      "small_recall": 0.49173980182481963,
+      "precision": 0.7556465243488579,
+      "recall": 0.5131133005577867,
+      "fp_pixels": 7348997,
+      "selected": false
+    }
+  ]
+}
