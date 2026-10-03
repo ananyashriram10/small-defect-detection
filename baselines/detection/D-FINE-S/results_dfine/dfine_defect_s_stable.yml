@@ -1,0 +1,39 @@
+__include__: [ './dfine_hgnetv2_s_custom.yml' ]
+
+output_dir: /workspace/dfine_run/dfine_runs/RunJ_dfine_s_imgsz640
+num_classes: 1
+remap_mscoco_category: False
+epochs: 50
+
+# Do not enable AMP. The earlier AMP run produced NaN predicted boxes.
+use_amp: False
+scaler:
+  enabled: False
+
+optimizer:
+  type: AdamW
+  lr: 5.0e-05
+  betas: [0.9, 0.999]
+  weight_decay: 0.0001
+  params:
+    - params: '^(?=.*backbone)(?!.*norm|bn).*$'
+      lr: 2.5e-05
+    - params: '^(?=.*backbone)(?=.*norm|bn).*$'
+      lr: 2.5e-05
+      weight_decay: 0.0
+    - params: '^(?=.*(?:encoder|decoder))(?=.*(?:norm|bn|bias)).*$'
+      weight_decay: 0.0
+
+train_dataloader:
+  total_batch_size: 8
+  num_workers: 2
+  dataset:
+    img_folder: /workspace/dfine_run/yolo_dataset/images/train
+    ann_file: /workspace/dfine_run/coco/annotations/instances_train.json
+
+val_dataloader:
+  total_batch_size: 8
+  num_workers: 2
+  dataset:
+    img_folder: /workspace/dfine_run/yolo_dataset/images/val
+    ann_file: /workspace/dfine_run/coco/annotations/instances_val.json

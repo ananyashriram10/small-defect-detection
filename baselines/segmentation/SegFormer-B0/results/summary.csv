@@ -1,0 +1,2 @@
+Experiment,Model,Batch,Epochs,mAP50,mAP50_95,Precision,Recall,mAP50_Small,mAP50_Medium,mAP50_Large,Recall_Small,Recall_Medium,Recall_Large,Inference_Time_ms,FP_per_Image,Dice,IoU,Notes
+RunK_segformer_b0_imgsz640,SegFormer-B0,8,21,,,0.7862035703656537,0.7293123353310565,,,,0.5119168394793261,0.673415693436067,0.7499036750193834,22.986168832293668,5062.9484375,0.7566901274921198,0.6086094418005386,"SegFormer-B0 via HuggingFace transformers, binary defect segmentation, fixed 640 split. mAP intentionally blank -- not a valid metric for dense semantic segmentation."

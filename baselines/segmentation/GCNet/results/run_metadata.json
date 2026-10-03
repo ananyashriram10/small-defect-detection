@@ -1,0 +1,20 @@
+{
+  "experiment": "RunN_gcnet_s_imgsz640",
+  "model": "GCNet-S",
+  "task": "binary semantic defect segmentation",
+  "pretrained_backbone_loaded": true,
+  "image_size": 640,
+  "batch_size": 8,
+  "max_epochs": 50,
+  "early_stopping_patience": 15,
+  "best_epoch": 29,
+  "best_validation_dice": 0.7106202979658393,
+  "split_counts": {
+    "train": 8858,
+    "val": 1892,
+    "test": 1920,
+    "test_small": 462,
+    "test_medium": 868,
+    "test_large": 590
+  }
+}

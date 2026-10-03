@@ -1,0 +1,22 @@
+{
+  "experiment": "RunM_mask2former_swin_tiny_imgsz640",
+  "model": "Mask2Former",
+  "task": "binary semantic defect segmentation",
+  "image_size": 640,
+  "batch_size": 4,
+  "max_epochs": 50,
+  "early_stopping_patience": 15,
+  "base_lr": 0.0001,
+  "backbone_lr": 1e-05,
+  "amp": false,
+  "best_epoch": 39,
+  "best_validation_dice": 0.7862805219775291,
+  "split_counts": {
+    "train": 8858,
+    "val": 1892,
+    "test": 1920,
+    "test_small": 462,
+    "test_medium": 868,
+    "test_large": 590
+  }
+}

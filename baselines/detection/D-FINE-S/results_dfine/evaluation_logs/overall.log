@@ -1,0 +1,255 @@
+Not init distributed mode.
+cfg: 
+{'_collate_fn': None,
+ '_criterion': None,
+ '_ema': None,
+ '_evaluator': None,
+ '_lr_scheduler': None,
+ '_lr_warmup_scheduler': None,
+ '_model': None,
+ '_optimizer': None,
+ '_postprocessor': None,
+ '_scaler': None,
+ '_train_batch_size': None,
+ '_train_dataloader': None,
+ '_train_dataset': None,
+ '_train_shuffle': None,
+ '_val_batch_size': None,
+ '_val_dataloader': None,
+ '_val_dataset': None,
+ '_val_shuffle': None,
+ '_writer': None,
+ 'batch_size': None,
+ 'checkpoint_freq': 12,
+ 'clip_max_norm': 0.1,
+ 'device': '',
+ 'ema_decay': 0.9999,
+ 'ema_warmups': 2000,
+ 'epochs': 50,
+ 'find_unused_parameters': False,
+ 'last_epoch': -1,
+ 'num_workers': 0,
+ 'output_dir': '/workspace/dfine_run/dfine_evaluations/RunJ_dfine_s_imgsz640/overall',
+ 'print_freq': 100,
+ 'resume': '/workspace/dfine_run/dfine_runs/RunJ_dfine_s_imgsz640/best_stg1.pth',
+ 'seed': None,
+ 'summary_dir': None,
+ 'sync_bn': True,
+ 'task': 'detection',
+ 'tuning': None,
+ 'use_amp': False,
+ 'use_ema': True,
+ 'yaml_cfg': {'DFINE': {'backbone': 'HGNetv2',
+                        'decoder': 'DFINETransformer',
+                        'encoder': 'HybridEncoder'},
+              'DFINECriterion': {'alpha': 0.75,
+                                 'gamma': 2.0,
+                                 'losses': ['vfl', 'boxes', 'local'],
+                                 'matcher': {'alpha': 0.25,
+                                             'gamma': 2.0,
+                                             'type': 'HungarianMatcher',
+                                             'weight_dict': {'cost_bbox': 5,
+                                                             'cost_class': 2,
+                                                             'cost_giou': 2}},
+                                 'reg_max': 32,
+                                 'weight_dict': {'loss_bbox': 5,
+                                                 'loss_ddf': 1.5,
+                                                 'loss_fgl': 0.15,
+                                                 'loss_giou': 2,
+                                                 'loss_vfl': 1}},
+              'DFINEPostProcessor': {'num_top_queries': 300},
+              'DFINETransformer': {'box_noise_scale': 1.0,
+                                   'cross_attn_method': 'default',
+                                   'eval_idx': -1,
+                                   'feat_channels': [256, 256, 256],
+                                   'feat_strides': [8, 16, 32],
+                                   'hidden_dim': 256,
+                                   'label_noise_ratio': 0.5,
+                                   'layer_scale': 1,
+                                   'num_denoising': 100,
+                                   'num_layers': 3,
+                                   'num_levels': 3,
+                                   'num_points': [3, 6, 3],
+                                   'num_queries': 300,
+                                   'query_select_method': 'default',
+                                   'reg_max': 32,
+                                   'reg_scale': 4},
+              'HGNetv2': {'freeze_at': -1,
+                          'freeze_norm': False,
+                          'local_model_dir': 'weight/hgnetv2/',
+                          'name': 'B0',
+                          'pretrained': False,
+                          'return_idx': [1, 2, 3],
+                          'use_lab': True},
+              'HybridEncoder': {'act': 'silu',
+                                'depth_mult': 0.34,
+                                'dim_feedforward': 1024,
+                                'dropout': 0.0,
+                                'enc_act': 'gelu',
+                                'expansion': 0.5,
+                                'feat_strides': [8, 16, 32],
+                                'hidden_dim': 256,
+                                'in_channels': [256, 512, 1024],
+                                'nhead': 8,
+                                'num_encoder_layers': 1,
+                                'use_encoder_idx': [2]},
+              '__include__': ['./dfine_hgnetv2_s_custom.yml'],
+              'checkpoint_freq': 12,
+              'clip_max_norm': 0.1,
+              'config': '/workspace/dfine_run/D-FINE/configs/dfine/custom/dfine_defect_s_overall.yml',
+              'criterion': 'DFINECriterion',
+              'ema': {'decay': 0.9999,
+                      'start': 0,
+                      'type': 'ModelEMA',
+                      'warmups': 1000},
+              'epochs': 50,
+              'eval_spatial_size': [640, 640],
+              'evaluator': {'iou_types': ['bbox'], 'type': 'CocoEvaluator'},
+              'exp_name': 'baseline',
+              'find_unused_parameters': False,
+              'lr_scheduler': {'gamma': 0.1,
+                               'milestones': [500],
+                               'type': 'MultiStepLR'},
+              'lr_warmup_scheduler': {'type': 'LinearWarmup',
+                                      'warmup_duration': 500},
+              'model': 'DFINE',
+              'num_classes': 1,
+              'optimizer': {'betas': [0.9, 0.999],
+                            'lr': 5e-05,
+                            'params': [{'lr': 2.5e-05,
+                                        'params': '^(?=.*backbone)(?!.*norm|bn).*$'},
+                                       {'lr': 2.5e-05,
+                                        'params': '^(?=.*backbone)(?=.*norm|bn).*$',
+                                        'weight_decay': 0.0},
+                                       {'params': '^(?=.*(?:encoder|decoder))(?=.*(?:norm|bn|bias)).*$',
+                                        'weight_decay': 0.0}],
+                            'type': 'AdamW',
+                            'weight_decay': 0.0001},
+              'output_dir': '/workspace/dfine_run/dfine_evaluations/RunJ_dfine_s_imgsz640/overall',
+              'postprocessor': 'DFINEPostProcessor',
+              'print_freq': 100,
+              'print_method': 'builtin',
+              'print_rank': 0,
+              'project_name': 'D-FINE',
+              'remap_mscoco_category': False,
+              'resume': '/workspace/dfine_run/dfine_runs/RunJ_dfine_s_imgsz640/best_stg1.pth',
+              'scaler': {'enabled': False, 'type': 'GradScaler'},
+              'sync_bn': True,
+              'task': 'detection',
+              'test_only': True,
+              'train_dataloader': {'collate_fn': {'base_size': 640,
+                                                  'base_size_repeat': 20,
+                                                  'ema_restart_decay': 0.9999,
+                                                  'stop_epoch': 200,
+                                                  'type': 'BatchImageCollateFunction'},
+                                   'dataset': {'ann_file': '/workspace/dfine_run/coco/annotations/instances_train.json',
+                                               'img_folder': '/workspace/dfine_run/yolo_dataset/images/train',
+                                               'return_masks': False,
+                                               'transforms': {'ops': [{'p': 0.5,
+                                                                       'type': 'RandomPhotometricDistort'},
+                                                                      {'fill': 0,
+                                                                       'type': 'RandomZoomOut'},
+                                                                      {'p': 0.8,
+                                                                       'type': 'RandomIoUCrop'},
+                                                                      {'min_size': 1,
+                                                                       'type': 'SanitizeBoundingBoxes'},
+                                                                      {'type': 'RandomHorizontalFlip'},
+                                                                      {'size': [640,
+                                                                                640],
+                                                                       'type': 'Resize'/workspace/dfine_run/D-FINE/src/solver/_solver.py:244: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  state = torch.load(path, map_location="cpu")
+},
+                                                                      {'min_size': 1,
+                                                                       'type': 'SanitizeBoundingBoxes'},
+                                                                      {'dtype': 'float32',
+                                                                       'scale': True,
+                                                                       'type': 'ConvertPILImage'},
+                                                                      {'fmt': 'cxcywh',
+                                                                       'normalize': True,
+                                                                       'type': 'ConvertBoxes'}],
+                                                              'policy': {'epoch': 200,
+                                                                         'name': 'stop_epoch',
+                                                                         'ops': ['RandomPhotometricDistort',
+                                                                                 'RandomZoomOut',
+                                                                                 'RandomIoUCrop']},
+                                                              'type': 'Compose'},
+                                               'type': 'CocoDetection'},
+                                   'drop_last': True,
+                                   'num_workers': 2,
+                                   'shuffle': True,
+                                   'total_batch_size': 8,
+                                   'type': 'DataLoader'},
+              'use_amp': False,
+              'use_ema': True,
+              'use_focal_loss': True,
+              'use_wandb': False,
+              'val_dataloader': {'collate_fn': {'type': 'BatchImageCollateFunction'},
+                                 'dataset': {'ann_file': '/workspace/dfine_run/coco/annotations/instances_test.json',
+                                             'img_folder': '/workspace/dfine_run/yolo_dataset/images/test',
+                                             'return_masks': False,
+                                             'transforms': {'ops': [{'size': [640,
+                                                                              640],
+                                                                     'type': 'Resize'},
+                                                                    {'dtype': 'float32',
+                                                                     'scale': True,
+                                                                     'type': 'ConvertPILImage'}],
+                                                            'type': 'Compose'},
+                                             'type': 'CocoDetection'},
+                                 'drop_last': False,
+                                 'num_workers': 2,
+                                 'shuffle': False,
+                                 'total_batch_size': 8,
+                                 'type': 'DataLoader'}}}
+building val_dataloader with batch_size=8...
+Resume checkpoint from /workspace/dfine_run/dfine_runs/RunJ_dfine_s_imgsz640/best_stg1.pth
+Load last_epoch
+Load model.state_dict
+Load criterion.state_dict
+Load postprocessor.state_dict
+Load ema.state_dict
+Test:  [  0/240]  eta: 0:04:49    time: 1.2057  data: 0.4984  max mem: 814
+Test:  [ 10/240]  eta: 0:00:55    time: 0.2418  data: 0.0674  max mem: 815
+Test:  [ 20/240]  eta: 0:00:41    time: 0.1391  data: 0.0233  max mem: 815
+Test:  [ 30/240]  eta: 0:00:35    time: 0.1302  data: 0.0227  max mem: 816
+Test:  [ 40/240]  eta: 0:00:31    time: 0.1260  data: 0.0214  max mem: 817
+Test:  [ 50/240]  eta: 0:00:29    time: 0.1269  data: 0.0221  max mem: 817
+Test:  [ 60/240]  eta: 0:00:26    time: 0.1228  data: 0.0256  max mem: 818
+Test:  [ 70/240]  eta: 0:00:24    time: 0.1265  data: 0.0276  max mem: 819
+Test:  [ 80/240]  eta: 0:00:23    time: 0.1360  data: 0.0274  max mem: 820
+Test:  [ 90/240]  eta: 0:00:21    time: 0.1392  data: 0.0292  max mem: 820
+Test:  [100/240]  eta: 0:00:20    time: 0.1652  data: 0.0506  max mem: 821
+Test:  [110/240]  eta: 0:00:19    time: 0.1577  data: 0.0453  max mem: 822
+Test:  [120/240]  eta: 0:00:17    time: 0.1284  data: 0.0207  max mem: 823
+Test:  [130/240]  eta: 0:00:15    time: 0.1297  data: 0.0221  max mem: 823
+Test:  [140/240]  eta: 0:00:14    time: 0.1282  data: 0.0220  max mem: 824
+Test:  [150/240]  eta: 0:00:12    time: 0.1275  data: 0.0203  max mem: 825
+Test:  [160/240]  eta: 0:00:11    time: 0.1201  data: 0.0209  max mem: 825
+Test:  [170/240]  eta: 0:00:09    time: 0.1183  data: 0.0205  max mem: 826
+Test:  [180/240]  eta: 0:00:08    time: 0.1292  data: 0.0203  max mem: 827
+Test:  [190/240]  eta: 0:00:06    time: 0.1310  data: 0.0209  max mem: 828
+Test:  [200/240]  eta: 0:00:05    time: 0.1301  data: 0.0212  max mem: 828
+Test:  [210/240]  eta: 0:00:04    time: 0.1279  data: 0.0202  max mem: 829
+Test:  [220/240]  eta: 0:00:02    time: 0.1247  data: 0.0195  max mem: 830
+Test:  [230/240]  eta: 0:00:01    time: 0.1242  data: 0.0197  max mem: 831
+Test:  [239/240]  eta: 0:00:00    time: 0.1253  data: 0.0201  max mem: 831
+Test: Total time: 0:00:32 (0.1362 s / it)
+Metrics: {'f1': 0.6403304931577588, 'precision': 0.7110091743119266, 'recall': 0.5824330671676844, 'iou': 0.3707066430164479, 'TPs': 2480, 'FPs': 1008, 'FNs': 1778}
+Averaged stats: 
+Accumulating evaluation results...
+COCOeval_opt.accumulate() finished...
+DONE (t=0.34s).
+IoU metric: bbox
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.348
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.645
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.335
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.198
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.362
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.393
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.235
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.476
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.601
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.400
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.600
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.691
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.920
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.650

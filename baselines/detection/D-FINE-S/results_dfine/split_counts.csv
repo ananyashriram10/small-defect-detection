@@ -1,0 +1,7 @@
+split,images,instances,skipped_boxes
+train,8858,18853,0
+val,1892,4119,0
+test,1920,4258,0
+test_small,462,955,0
+test_medium,868,2053,0
+test_large,590,1250,0
