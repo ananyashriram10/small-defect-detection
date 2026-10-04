@@ -1,0 +1,8 @@
+dataset,surface_type,label_type,num_classes,small,medium,large,total,classes
+DAGM,synthetic textured industrial surfaces,texture_class,10,593,1095,412,2100,"class1, class10, class2, class3, class4, class5, class6, class7, class8, class9"
+GC10-DET,steel/metal strip surfaces,defect_type,12,322,622,1348,2292,"10_yaozhe, 10_yaozhed, 1_chongkong, 2_hanfeng, 3_yueyawan, 4_shuiban, 5_youban, 6_siban, 7_yiwu, 8_yahen, 9_zhehen, d"
+KolektorSDD2,electrical commutator production surfaces,generic_defect,1,77,177,102,356,surface_defect
+MPDD,painted metal/product surfaces,product_type,6,123,92,67,282,"bracket_black, bracket_brown, bracket_white, connector, metal_plate, tubes"
+MTD,magnetic tile surfaces,defect_type,6,188,57,143,388,"blowhole, break, crack, fray, free, uneven"
+Severstal,steel surface defects,generic_defect,4,1618,3656,1821,7095,"defect1, defect2, defect3, defect4"
+VisA,mixed industrial object/surface categories,product_type,12,114,42,1,157,"candle, capsules, cashew, chewinggum, fryum, macaroni1, macaroni2, pcb1, pcb2, pcb3, pcb4, pipe_fryum"

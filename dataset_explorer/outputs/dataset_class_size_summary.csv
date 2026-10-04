@@ -1,0 +1,52 @@
+dataset,surface_type,listed_class,translated_class,label_type,small,medium,large,total
+DAGM,synthetic textured industrial surfaces,class1,"synthetic background texture class, generic surface defect",texture_class,0,94,56,150
+DAGM,synthetic textured industrial surfaces,class10,"synthetic background texture class, generic surface defect",texture_class,8,265,27,300
+DAGM,synthetic textured industrial surfaces,class2,"synthetic background texture class, generic surface defect",texture_class,41,102,7,150
+DAGM,synthetic textured industrial surfaces,class3,"synthetic background texture class, generic surface defect",texture_class,32,114,4,150
+DAGM,synthetic textured industrial surfaces,class4,"synthetic background texture class, generic surface defect",texture_class,0,101,49,150
+DAGM,synthetic textured industrial surfaces,class5,"synthetic background texture class, generic surface defect",texture_class,2,148,0,150
+DAGM,synthetic textured industrial surfaces,class6,"synthetic background texture class, generic surface defect",texture_class,0,0,150,150
+DAGM,synthetic textured industrial surfaces,class7,"synthetic background texture class, generic surface defect",texture_class,0,182,118,300
+DAGM,synthetic textured industrial surfaces,class8,"synthetic background texture class, generic surface defect",texture_class,210,89,1,300
+DAGM,synthetic textured industrial surfaces,class9,"synthetic background texture class, generic surface defect",texture_class,300,0,0,300
+GC10-DET,steel/metal strip surfaces,10_yaozhe,waist folding,defect_type,0,0,9,9
+GC10-DET,steel/metal strip surfaces,10_yaozhed,waist folding,defect_type,0,1,130,131
+GC10-DET,steel/metal strip surfaces,1_chongkong,punching hole,defect_type,83,16,230,329
+GC10-DET,steel/metal strip surfaces,2_hanfeng,weld line,defect_type,0,93,419,512
+GC10-DET,steel/metal strip surfaces,3_yueyawan,crescent gap,defect_type,7,96,161,264
+GC10-DET,steel/metal strip surfaces,4_shuiban,water spot,defect_type,13,128,169,310
+GC10-DET,steel/metal strip surfaces,5_youban,oil spot,defect_type,99,100,51,250
+GC10-DET,steel/metal strip surfaces,6_siban,silk spot,defect_type,1,167,566,734
+GC10-DET,steel/metal strip surfaces,7_yiwu,inclusion,defect_type,128,38,35,201
+GC10-DET,steel/metal strip surfaces,8_yahen,rolled pit,defect_type,4,25,17,46
+GC10-DET,steel/metal strip surfaces,9_zhehen,crease,defect_type,4,22,27,53
+GC10-DET,steel/metal strip surfaces,d,"unclear, generic surface defect",defect_type,0,0,1,1
+KolektorSDD2,electrical commutator production surfaces,surface_defect,generic surface defect,generic_defect,77,177,102,356
+MPDD,painted metal/product surfaces,bracket_black,"product type, generic surface anomaly",product_type,47,0,0,47
+MPDD,painted metal/product surfaces,bracket_brown,"product type, generic surface anomaly",product_type,34,17,0,51
+MPDD,painted metal/product surfaces,bracket_white,"product type, generic surface anomaly",product_type,30,0,0,30
+MPDD,painted metal/product surfaces,connector,"product type, generic surface anomaly",product_type,0,14,0,14
+MPDD,painted metal/product surfaces,metal_plate,"product type, generic surface anomaly",product_type,0,4,67,71
+MPDD,painted metal/product surfaces,tubes,"product type, generic surface anomaly",product_type,12,57,0,69
+MTD,magnetic tile surfaces,blowhole,"blowhole, gas cavity from casting",defect_type,110,5,0,115
+MTD,magnetic tile surfaces,break,"break, physical separation",defect_type,38,30,17,85
+MTD,magnetic tile surfaces,crack,crack,defect_type,34,17,6,57
+MTD,magnetic tile surfaces,fray,"fray, worn or frayed edge",defect_type,4,5,23,32
+MTD,magnetic tile surfaces,free,"ambiguous, surface irregularity",defect_type,0,0,0,0
+MTD,magnetic tile surfaces,uneven,uneven surface,defect_type,2,0,97,99
+Severstal,steel surface defects,defect1,"generic surface defect, no official subtype meaning",generic_defect,654,241,2,897
+Severstal,steel surface defects,defect2,"generic surface defect, no official subtype meaning",generic_defect,143,104,0,247
+Severstal,steel surface defects,defect3,"generic surface defect, no official subtype meaning",generic_defect,808,3043,1299,5150
+Severstal,steel surface defects,defect4,"generic surface defect, no official subtype meaning",generic_defect,13,268,520,801
+VisA,mixed industrial object/surface categories,candle,"product type, generic anomaly",product_type,11,1,0,12
+VisA,mixed industrial object/surface categories,capsules,"product type, generic anomaly",product_type,30,0,0,30
+VisA,mixed industrial object/surface categories,cashew,"product type, generic anomaly",product_type,10,0,0,10
+VisA,mixed industrial object/surface categories,chewinggum,"product type, generic anomaly",product_type,2,14,0,16
+VisA,mixed industrial object/surface categories,fryum,"product type, generic anomaly",product_type,5,3,1,9
+VisA,mixed industrial object/surface categories,macaroni1,"product type, generic anomaly",product_type,16,1,0,17
+VisA,mixed industrial object/surface categories,macaroni2,"product type, generic anomaly",product_type,1,0,0,1
+VisA,mixed industrial object/surface categories,pcb1,"product type, generic anomaly",product_type,14,0,0,14
+VisA,mixed industrial object/surface categories,pcb2,"product type, generic anomaly",product_type,7,5,0,12
+VisA,mixed industrial object/surface categories,pcb3,"product type, generic anomaly",product_type,2,17,0,19
+VisA,mixed industrial object/surface categories,pcb4,"product type, generic anomaly",product_type,1,1,0,2
+VisA,mixed industrial object/surface categories,pipe_fryum,"product type, generic anomaly",product_type,15,0,0,15

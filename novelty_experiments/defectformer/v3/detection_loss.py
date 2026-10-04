@@ -1,0 +1,207 @@
+"""
+DETR-style detection loss for the new detection queries: Hungarian matching
+(classification + L1 box + GIoU cost) followed by the matched loss. Standard
+DETR-family formulation (same lineage as D-FINE, already a detection baseline in
+this project) -- new code because Mask2Former has no detection component to reuse,
+unlike the segmentation loss which reuses Mask2Former's own criterion directly.
+"""
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from scipy.optimize import linear_sum_assignment
+
+
+def box_cxcywh_to_xyxy(boxes):
+    cx, cy, w, h = boxes.unbind(-1)
+    return torch.stack([cx - 0.5 * w, cy - 0.5 * h, cx + 0.5 * w, cy + 0.5 * h], dim=-1)
+
+
+def box_area(boxes):
+    return (boxes[..., 2] - boxes[..., 0]).clamp(min=0) * (boxes[..., 3] - boxes[..., 1]).clamp(min=0)
+
+
+def focal_loss(logits, targets, weight=None, gamma=2.0):
+    """Multi-class focal loss (Lin et al. 2017), matching F.cross_entropy's weighted-mean
+    reduction convention (sum of weighted per-sample loss / sum of weights) so it's a drop-in
+    scale-compatible replacement. logits: [N, C], targets: [N] (class indices).
+
+    Standard weighted CE down-weights the no-object class by a fixed scalar regardless of how
+    confident the model already is on any given query -- with ~100 queries and typically 1-2
+    real objects per image here (a much sparser ratio than COCO, which eos_coef=0.1 was tuned
+    against), that fixed down-weight still leaves background pressure dominating the loss.
+    Focal loss's (1-p_t)^gamma term additionally suppresses already-easy/confident predictions
+    per-example rather than per-class, so it keeps pushing on whichever queries are still
+    uncertain -- the actual mechanism the imbalance calls for, not just a bigger hand-tuned knob.
+    """
+    log_probs = F.log_softmax(logits, dim=-1)
+    ce_per_sample = F.nll_loss(log_probs, targets, weight=weight, reduction='none')
+    p_t = log_probs.gather(1, targets.unsqueeze(1)).squeeze(1).exp()
+    focal_factor = (1 - p_t).clamp(min=0) ** gamma
+    weighted = focal_factor * ce_per_sample
+    denom = weight[targets].sum().clamp(min=1e-6) if weight is not None else targets.numel()
+    return weighted.sum() / denom
+
+
+def generalized_box_iou(boxes1, boxes2):
+    """boxes1: [N, 4], boxes2: [M, 4], both xyxy. Returns [N, M] GIoU matrix."""
+    area1 = box_area(boxes1)
+    area2 = box_area(boxes2)
+
+    lt = torch.max(boxes1[:, None, :2], boxes2[None, :, :2])
+    rb = torch.min(boxes1[:, None, 2:], boxes2[None, :, 2:])
+    wh = (rb - lt).clamp(min=0)
+    inter = wh[..., 0] * wh[..., 1]
+    union = area1[:, None] + area2[None, :] - inter
+    iou = inter / union.clamp(min=1e-6)
+
+    lt_c = torch.min(boxes1[:, None, :2], boxes2[None, :, :2])
+    rb_c = torch.max(boxes1[:, None, 2:], boxes2[None, :, 2:])
+    wh_c = (rb_c - lt_c).clamp(min=0)
+    area_c = wh_c[..., 0] * wh_c[..., 1]
+
+    return iou - (area_c - union) / area_c.clamp(min=1e-6)
+
+
+class HungarianMatcher(nn.Module):
+    """Bipartite matching between predicted and ground-truth boxes for one image,
+    cost = weighted sum of classification cost + L1 box distance + GIoU cost.
+    Standard DETR formulation. No learnable parameters."""
+
+    def __init__(self, cost_class=1.0, cost_bbox=5.0, cost_giou=2.0):
+        super().__init__()
+        self.cost_class = cost_class
+        self.cost_bbox = cost_bbox
+        self.cost_giou = cost_giou
+
+    @torch.no_grad()
+    def forward(self, class_logits, boxes, target_classes, target_boxes):
+        """class_logits: [Q, num_classes+1], boxes: [Q, 4] (cxcywh, normalized).
+        target_classes: [T], target_boxes: [T, 4] (cxcywh, normalized).
+        Returns (query_indices, target_indices) for one image."""
+        if target_classes.numel() == 0:
+            return torch.empty(0, dtype=torch.long), torch.empty(0, dtype=torch.long)
+
+        probs = class_logits.softmax(-1)
+        cost_class = -probs[:, target_classes]  # [Q, T]
+
+        cost_bbox = torch.cdist(boxes, target_boxes, p=1)  # [Q, T]
+
+        cost_giou = -generalized_box_iou(box_cxcywh_to_xyxy(boxes), box_cxcywh_to_xyxy(target_boxes))
+
+        cost = self.cost_class * cost_class + self.cost_bbox * cost_bbox + self.cost_giou * cost_giou
+        query_idx, target_idx = linear_sum_assignment(cost.cpu().numpy())
+        return torch.as_tensor(query_idx, dtype=torch.long), torch.as_tensor(target_idx, dtype=torch.long)
+
+
+class DetectionLoss(nn.Module):
+    """Matches then computes CE (with a no-object class for unmatched queries) +
+    L1 box + GIoU loss, DETR-style. num_classes excludes the no-object class."""
+
+    def __init__(self, num_classes, matcher=None, class_weight=1.0, bbox_weight=2.0, giou_weight=2.0,
+                 no_object_weight=0.25, focal_gamma=2.0):
+        super().__init__()
+        self.num_classes = num_classes
+        self.matcher = matcher or HungarianMatcher()
+        self.class_weight = class_weight
+        # bbox_weight dropped from 5.0 (v1/v2's DETR-standard value) to 2.0 for v3 --
+        # visual inspection of v1's real predictions showed box position landing near
+        # ground truth while classification confidence stayed near zero; weighting
+        # position 5x over classification is a plausible structural contributor to that
+        # split, on top of whatever the no-object imbalance itself was doing.
+        self.bbox_weight = bbox_weight
+        self.giou_weight = giou_weight
+        self.focal_gamma = focal_gamma
+        # Down-weight the no-object class -- still needed alongside focal loss (see
+        # focal_loss()'s docstring for why 0.1, the standard DETR value, wasn't enough
+        # alone here); raised from 0.1 to 0.25 since focal loss's own per-example
+        # focusing term now shares that job, so the fixed class weight doesn't need to
+        # carry the whole imbalance by itself.
+        class_weights = torch.ones(num_classes + 1)
+        class_weights[-1] = no_object_weight
+        self.register_buffer('class_weights', class_weights)
+
+    def forward(self, class_logits, boxes, targets):
+        """class_logits: [B, Q, num_classes+1], boxes: [B, Q, 4].
+        targets: list of B dicts, each {'classes': [T], 'boxes': [T, 4]} (cxcywh, normalized)."""
+        B, Q = class_logits.shape[:2]
+        no_object_class = self.num_classes
+
+        target_class_full = torch.full((B, Q), no_object_class, dtype=torch.long, device=class_logits.device)
+        bbox_losses, giou_losses = [], []
+
+        for b in range(B):
+            q_idx, t_idx = self.matcher(class_logits[b], boxes[b], targets[b]['classes'], targets[b]['boxes'])
+            if q_idx.numel() == 0:
+                continue
+            target_class_full[b, q_idx] = targets[b]['classes'][t_idx].to(class_logits.device)
+
+            matched_boxes = boxes[b, q_idx]
+            matched_targets = targets[b]['boxes'][t_idx].to(boxes.device)
+            bbox_losses.append(F.l1_loss(matched_boxes, matched_targets, reduction='sum'))
+            giou = generalized_box_iou(box_cxcywh_to_xyxy(matched_boxes), box_cxcywh_to_xyxy(matched_targets))
+            giou_losses.append((1 - giou.diagonal()).sum())
+
+        class_loss = focal_loss(
+            class_logits.reshape(-1, class_logits.shape[-1]), target_class_full.reshape(-1),
+            weight=self.class_weights, gamma=self.focal_gamma,
+        )
+
+        n_matched = max(sum(t['classes'].numel() for t in targets), 1)
+        bbox_loss = torch.stack(bbox_losses).sum() / n_matched if bbox_losses else class_logits.new_tensor(0.0)
+        giou_loss = torch.stack(giou_losses).sum() / n_matched if giou_losses else class_logits.new_tensor(0.0)
+
+        total = self.class_weight * class_loss + self.bbox_weight * bbox_loss + self.giou_weight * giou_loss
+        return total, {'class_loss': class_loss.item(), 'bbox_loss': bbox_loss.item() if bbox_losses else 0.0,
+                       'giou_loss': giou_loss.item() if giou_losses else 0.0}
+
+
+if __name__ == '__main__':
+    torch.manual_seed(0)
+    B, Q, num_classes = 2, 100, 2
+
+    class_logits = torch.randn(B, Q, num_classes + 1, requires_grad=True)
+    boxes = torch.rand(B, Q, 4, requires_grad=True)
+
+    targets = [
+        {'classes': torch.tensor([0, 1]), 'boxes': torch.tensor([[0.3, 0.3, 0.1, 0.1], [0.7, 0.6, 0.2, 0.15]])},
+        {'classes': torch.tensor([1]), 'boxes': torch.tensor([[0.5, 0.5, 0.3, 0.3]])},
+    ]
+
+    loss_fn = DetectionLoss(num_classes=num_classes)
+    loss, parts = loss_fn(class_logits, boxes, targets)
+    print('detection loss:', loss.item(), 'parts:', parts)
+    assert loss.item() == loss.item(), 'NaN loss'
+
+    loss.backward()
+    assert class_logits.grad is not None and class_logits.grad.abs().sum() > 0
+    assert boxes.grad is not None and boxes.grad.abs().sum() > 0
+    print('OK: Hungarian matcher + DETR-style detection loss verified (matching, gradients both check out).')
+
+    # Sanity check: focal_loss's whole point is suppressing already-confident-correct
+    # predictions harder than plain CE would -- verify that's actually what it does, not
+    # just that it runs. Two samples, both correctly classified, one far more confidently
+    # than the other; focal loss should shrink the confident one's contribution by more,
+    # relative to plain CE, than it shrinks the uncertain one's.
+    confident_logits = torch.tensor([[10.0, 0.0]])   # ~p_t=1.0 for class 0
+    uncertain_logits = torch.tensor([[1.0, 0.6]])    # correct, but far less confident
+    target = torch.tensor([0])
+    ce_confident = F.cross_entropy(confident_logits, target).item()
+    ce_uncertain = F.cross_entropy(uncertain_logits, target).item()
+    fl_confident = focal_loss(confident_logits, target).item()
+    fl_uncertain = focal_loss(uncertain_logits, target).item()
+    ratio_ce = ce_confident / ce_uncertain
+    ratio_fl = fl_confident / fl_uncertain
+    print(f'CE   confident/uncertain ratio: {ratio_ce:.4f}')
+    print(f'Focal confident/uncertain ratio: {ratio_fl:.4f} (expected << CE ratio)')
+    assert ratio_fl < ratio_ce, 'focal loss should suppress the confident example relatively more than CE does'
+    print('OK: focal_loss verified to actually down-weight confident predictions harder than CE, not just run.')
+
+    # Sanity check: a query whose box is IDENTICAL to a target should be preferentially matched.
+    matcher = HungarianMatcher()
+    perfect_logits = torch.zeros(5, num_classes + 1)
+    perfect_logits[2, 0] = 10.0  # query 2 confidently predicts class 0
+    perfect_boxes = torch.rand(5, 4)
+    perfect_boxes[2] = torch.tensor([0.3, 0.3, 0.1, 0.1])  # exact match to the target below
+    q_idx, t_idx = matcher(perfect_logits, perfect_boxes, torch.tensor([0]), torch.tensor([[0.3, 0.3, 0.1, 0.1]]))
+    print('matched query index for the exact-match case:', q_idx.tolist(), '(expected [2])')
+    assert q_idx.tolist() == [2], 'Hungarian matcher failed to prefer the obviously correct match'

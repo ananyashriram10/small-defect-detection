@@ -82,4 +82,4 @@ validation split only. The threshold with the highest validation Dice subject to
 the configured small-defect recall floor is then frozen for test metrics and
 qualitative panels. No test labels are used for calibration.
 
-Results are intentionally not included until the v2 experiment has been run.
+Completed run metrics are available in [the saved results](results/ANZD_PIDNet_v2_zoom_component_full/summary.csv).
