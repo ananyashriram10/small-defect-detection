@@ -1,6 +1,6 @@
 # ANZD-PIDNet v4
 
-## Quality-first small-defect segmentation
+## Quality first small defect segmentation
 
 ANZD-PIDNet v4 is a segmentation-only extension of ANZD-PIDNet v3. It is
 designed for the observed failure mode in v3: the model finds many small
