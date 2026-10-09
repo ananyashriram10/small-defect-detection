@@ -118,9 +118,38 @@ Test is evaluated once with both frozen. `summary.csv` reports metrics with
 and without the blob filter (`*_No_Postprocess`), and the filter's CPU time
 separately from model latency.
 
-## Ablation: run these three
+## Run the full model once
 
-Same seed and split for all three. Run A first.
+The selected budget-conscious run is `METHOD=zoom_component SHAPE_HEAD=1`.
+Runs A and B below are optional comparisons; neither must run before the full
+model. Before starting a paid RunPod session, put a PIDNet-S ImageNet
+checkpoint at `PRETRAINED_PATH`. The original author's individual download
+link currently returns 404. A [public Zenodo mirror](https://zenodo.org/records/14606189)
+provides `PIDNet_S_ImageNet.pth.tar` (MD5
+`0d25ff46681c795d3c7bc8eb6aa62e76`). The local copy passed a safe
+PyTorch load and matched all 162 of 162 v5 core trunk tensors. The mirror is
+not maintained by the PIDNet authors, so its original provenance cannot be
+confirmed from the surviving official link. The trainer checks that at least
+95% of the core trunk loads before training.
+
+```bash
+cd /workspace/mandi
+export DATASET_ROOT=/workspace/dataset
+export PRETRAINED_PATH=/workspace/pretrained/PIDNet_S_ImageNet.pth.tar
+test -s "$PRETRAINED_PATH"
+python novelty_experiments/anzd_pidnet_v5/verify.py
+METHOD=zoom_component SHAPE_HEAD=1 PRETRAINED_DOWNLOAD=0 \
+  nohup python -u novelty_experiments/anzd_pidnet_v5/train_runpod.py > v5_full.log 2>&1 &
+tail -f v5_full.log
+```
+
+Set `WANDB_API_KEY` for online logging or `WANDB_MODE=disabled`. The checkpoint
+preflight prevents the trainer from spending paid pod time attempting an
+unavailable download.
+
+## Optional ablation configurations
+
+These use the same seed and split if a comparison is needed later.
 
 | Run | Command | What it shows |
 |---|---|---|
@@ -128,29 +157,20 @@ Same seed and split for all three. Run A first.
 | **B** | `METHOD=zoom_component SHAPE_HEAD=0` | ANZD's contribution = B − A |
 | **C** | `METHOD=zoom_component SHAPE_HEAD=1` | Full v5. Shape head contribution = C − B |
 
-```bash
-cd /workspace/mandi
-python novelty_experiments/anzd_pidnet_v5/verify.py
-export WANDB_API_KEY=<key> DATASET_ROOT=/workspace/dataset
-METHOD=baseline SHAPE_HEAD=0 nohup python -u novelty_experiments/anzd_pidnet_v5/train_runpod.py > v5_A.log 2>&1 &
-tail -f v5_A.log
-```
-
-The first run downloads `PIDNet_S_ImageNet.pth.tar` with `gdown` into
-`/workspace/pretrained/`. If Google Drive refuses (quota), download it by
-hand from the [official PIDNet README](https://github.com/XuJiacong/PIDNet)
-and set `PRETRAINED_PATH`. Check the log for the `ImageNet pretrained load`
-report, where `core_coverage` should be 1.0.
+The trainer can attempt to download `PIDNet_S_ImageNet.pth.tar` with `gdown`
+when `PRETRAINED_DOWNLOAD=1`, but the [official PIDNet README](https://github.com/XuJiacong/PIDNet)
+warns that its individual links may no longer work. Check the log for the
+`ImageNet pretrained load` report; `core_coverage` must be at least 0.95.
 
 ## Go / no-go checkpoints
 
 - **Epoch 1:** `core_coverage` printed ≥ 0.95 (enforced), and loss is finite.
-- **During run A:** inspect EMA validation trends and training stability
-  before proceeding to B and C.
+- **During the full run:** inspect EMA validation trends and training stability.
   `clipped_batch_fraction` near 1.0 in `training_history.csv` means
   `GRAD_CLIP_NORM` is throttling SGD; raise it.
-- **After A:** if A alone reaches SegFormer-level Dice, the paper's claim for
-  ANZD rests on B − A (small recall, FP/image) and the speed advantage.
+- **After the full run:** evaluate its frozen checkpoint and calibrated
+  operating point. A single run measures full-model performance but cannot
+  isolate the contributions of ANZD or the shape head.
 
 ## Outputs
 

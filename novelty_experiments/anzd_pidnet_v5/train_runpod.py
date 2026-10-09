@@ -14,7 +14,8 @@ be measured. v5 fixes the recipe:
 
 ANZD (training-only area-normalized zoom + component-balanced recall) is
 unchanged from v4. SHAPE_HEAD toggles the v3/v4 boundary/signed-distance
-head so the ablation below can run from this one script.
+head. The full v5 run uses METHOD=zoom_component and SHAPE_HEAD=1; the
+other modes are optional comparisons, not prerequisites.
 
 Ablation matrix (same seed/split):
     A  METHOD=baseline        SHAPE_HEAD=0   pretrained PIDNet-S + v5 recipe
@@ -24,9 +25,11 @@ Ablation matrix (same seed/split):
 RunPod example:
     export WANDB_API_KEY=<key>
     export DATASET_ROOT=/workspace/dataset
-    export METHOD=baseline SHAPE_HEAD=0
-    nohup python -u novelty_experiments/anzd_pidnet_v5/train_runpod.py > v5_A.log 2>&1 &
-    tail -f v5_A.log
+    export METHOD=zoom_component SHAPE_HEAD=1
+    export PRETRAINED_PATH=/workspace/pretrained/PIDNet_S_ImageNet.pth.tar
+    test -s "$PRETRAINED_PATH"  # verify weights before paying for a training run
+    PRETRAINED_DOWNLOAD=0 nohup python -u novelty_experiments/anzd_pidnet_v5/train_runpod.py > v5_full.log 2>&1 &
+    tail -f v5_full.log
 """
 
 from __future__ import annotations
